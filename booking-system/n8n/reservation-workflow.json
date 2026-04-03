@@ -1,0 +1,163 @@
+{
+  "name": "Clay & Light — Table Reservation Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "table-reservation",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "webhook-reservation",
+      "name": "Webhook — Receive Reservation",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "table-reservation-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst required = ['name', 'email', 'reservation_time', 'persons'];\nconst missing = required.filter(f => !body[f]);\n\nif (missing.length > 0) {\n  throw new Error(`Missing required fields: ${missing.join(', ')}`);\n}\n\nif (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(body.email)) {\n  throw new Error('Invalid email address');\n}\n\nconst persons = parseInt(body.persons);\nif (persons < 1 || persons > 50) {\n  throw new Error('Persons must be between 1 and 50');\n}\n\nconst avgSpend = parseFloat(body.avg_spend_per_person) || 25;\nconst estimatedRevenue = persons * avgSpend;\n\nreturn [{\n  json: {\n    name: body.name.trim(),\n    email: body.email.trim().toLowerCase(),\n    phone: body.phone || null,\n    reservation_time: new Date(body.reservation_time).toISOString(),\n    persons: persons,\n    notes: body.notes || null,\n    avg_spend_per_person: avgSpend,\n    estimated_revenue: estimatedRevenue,\n    status: 'confirmed',\n    formattedTime: new Date(body.reservation_time).toLocaleString('de-AT', {\n      timeZone: 'Europe/Vienna',\n      weekday: 'long',\n      year: 'numeric',\n      month: 'long',\n      day: 'numeric',\n      hour: '2-digit',\n      minute: '2-digit'\n    })\n  }\n}];"
+      },
+      "id": "code-validate-res",
+      "name": "Validate & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "reservations",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "reservation_time": "={{ $json.reservation_time }}",
+            "persons": "={{ $json.persons }}",
+            "notes": "={{ $json.notes }}",
+            "avg_spend_per_person": "={{ $json.avg_spend_per_person }}",
+            "status": "={{ $json.status }}"
+          }
+        }
+      },
+      "id": "supabase-insert-res",
+      "name": "Insert into Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [720, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase — Clay & Light"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Validate & Normalize').item.json.email }}",
+        "subject": "Deine Tischreservierung bei Clay & Light",
+        "emailType": "html",
+        "message": "=<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n</head>\n<body style=\"margin:0;padding:0;background:#F0EEE9;font-family:'Georgia',serif;\">\n  <table width=\"100%\" style=\"background:#F0EEE9;padding:40px 20px;\">\n    <tr><td align=\"center\">\n      <table width=\"600\" style=\"background:#fff;border-radius:8px;overflow:hidden;\">\n        <tr>\n          <td style=\"background:#6B1E2E;padding:40px 48px;\">\n            <h1 style=\"margin:0;color:#F0EEE9;font-size:28px;font-weight:400;\">Clay &amp; Light</h1>\n            <p style=\"margin:8px 0 0;color:#C2D6B8;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;\">Kaffee. Ton. Stille.</p>\n          </td>\n        </tr>\n        <tr>\n          <td style=\"padding:48px;\">\n            <h2 style=\"margin:0 0 8px;color:#6B1E2E;font-size:22px;font-weight:400;\">Dein Tisch ist reserviert.</h2>\n            <p style=\"margin:0 0 32px;color:#9E9189;font-size:15px;\">Wir freuen uns auf deinen Besuch.</p>\n\n            <table width=\"100%\" style=\"background:#F0EEE9;border-radius:6px;padding:24px;margin-bottom:32px;\">\n              <tr>\n                <td style=\"padding:8px 0;border-bottom:1px solid #C2D6B8;\">\n                  <span style=\"color:#9E9189;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;\">Name</span><br>\n                  <span style=\"color:#1A1714;font-size:16px;\">{{ $('Validate & Normalize').item.json.name }}</span>\n                </td>\n              </tr>\n              <tr>\n                <td style=\"padding:8px 0;border-bottom:1px solid #C2D6B8;\">\n                  <span style=\"color:#9E9189;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;\">Datum &amp; Uhrzeit</span><br>\n                  <span style=\"color:#1A1714;font-size:16px;\">{{ $('Validate & Normalize').item.json.formattedTime }}</span>\n                </td>\n              </tr>\n              <tr>\n                <td style=\"padding:8px 0;\">\n                  <span style=\"color:#9E9189;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;\">Personen</span><br>\n                  <span style=\"color:#1A1714;font-size:16px;\">{{ $('Validate & Normalize').item.json.persons }}</span>\n                </td>\n              </tr>\n            </table>\n\n            {{ $('Validate & Normalize').item.json.notes ? '<p style=\"color:#1A1714;font-size:14px;padding:16px;background:#F0EEE9;border-radius:6px;\"><strong>Deine Notizen:</strong> ' + $('Validate & Normalize').item.json.notes + '</p>' : '' }}\n\n            <p style=\"color:#9E9189;font-size:13px;line-height:1.7;margin-top:32px;\">\n              Bei Fragen erreichst du uns unter <a href=\"mailto:hello@clayandlight.at\" style=\"color:#6B9A5A;\">hello@clayandlight.at</a>.\n            </p>\n          </td>\n        </tr>\n        <tr>\n          <td style=\"background:#4A1220;padding:24px 48px;\">\n            <p style=\"margin:0;color:#9E9189;font-size:12px;\">Clay &amp; Light · Wien · <a href=\"https://clayandlight.at/datenschutz\" style=\"color:#C2D6B8;\">Datenschutz</a> · <a href=\"https://clayandlight.at/impressum\" style=\"color:#C2D6B8;\">Impressum</a></p>\n          </td>\n        </tr>\n      </table>\n    </td></tr>\n  </table>\n</body>\n</html>",
+        "options": {
+          "fromName": "Clay & Light"
+        }
+      },
+      "id": "gmail-customer-res",
+      "name": "Email — Customer Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [960, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-credentials",
+          "name": "Gmail — Clay & Light"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "hello@clayandlight.at",
+        "subject": "=🪑 Neue Tischreservierung — {{ $('Validate & Normalize').item.json.name }} ({{ $('Validate & Normalize').item.json.persons }} Pers.)",
+        "emailType": "html",
+        "message": "=<!DOCTYPE html>\n<html lang=\"de\">\n<head><meta charset=\"UTF-8\"></head>\n<body style=\"margin:0;padding:0;background:#F0EEE9;font-family:monospace;\">\n  <table width=\"100%\" style=\"padding:32px;\">\n    <tr><td align=\"center\">\n      <table width=\"560\" style=\"background:#fff;border-radius:6px;border-left:4px solid #6B1E2E;padding:32px;\">\n        <tr><td>\n          <h2 style=\"margin:0 0 24px;color:#6B1E2E;font-size:20px;\">Neue Tischreservierung</h2>\n          <table width=\"100%\" style=\"border-collapse:collapse;font-size:14px;\">\n            <tr style=\"background:#F0EEE9;\"><td style=\"padding:8px 12px;color:#9E9189;\">Name</td><td style=\"padding:8px 12px;color:#1A1714;\">{{ $('Validate & Normalize').item.json.name }}</td></tr>\n            <tr><td style=\"padding:8px 12px;color:#9E9189;\">E-Mail</td><td style=\"padding:8px 12px;\"><a href=\"mailto:{{ $('Validate & Normalize').item.json.email }}\" style=\"color:#6B9A5A;\">{{ $('Validate & Normalize').item.json.email }}</a></td></tr>\n            <tr style=\"background:#F0EEE9;\"><td style=\"padding:8px 12px;color:#9E9189;\">Telefon</td><td style=\"padding:8px 12px;color:#1A1714;\">{{ $('Validate & Normalize').item.json.phone || '—' }}</td></tr>\n            <tr><td style=\"padding:8px 12px;color:#9E9189;\">Datum &amp; Zeit</td><td style=\"padding:8px 12px;color:#1A1714;font-weight:bold;\">{{ $('Validate & Normalize').item.json.formattedTime }}</td></tr>\n            <tr style=\"background:#F0EEE9;\"><td style=\"padding:8px 12px;color:#9E9189;\">Personen</td><td style=\"padding:8px 12px;color:#1A1714;\">{{ $('Validate & Normalize').item.json.persons }}</td></tr>\n            <tr><td style=\"padding:8px 12px;color:#9E9189;\">Geschätzter Umsatz</td><td style=\"padding:8px 12px;color:#6B1E2E;font-weight:bold;\">€ {{ $('Validate & Normalize').item.json.estimated_revenue.toFixed(2) }}</td></tr>\n            <tr style=\"background:#F0EEE9;\"><td style=\"padding:8px 12px;color:#9E9189;\">Notizen</td><td style=\"padding:8px 12px;color:#1A1714;\">{{ $('Validate & Normalize').item.json.notes || '—' }}</td></tr>\n          </table>\n          <p style=\"margin:24px 0 0;color:#9E9189;font-size:12px;\">Reservierungs-ID: {{ $('Insert into Supabase').item.json.id }}</p>\n        </td></tr>\n      </table>\n    </td></tr>\n  </table>\n</body>\n</html>",
+        "options": {
+          "fromName": "Clay & Light Buchungssystem"
+        }
+      },
+      "id": "gmail-owner-res",
+      "name": "Email — Owner Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [960, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-credentials",
+          "name": "Gmail — Clay & Light"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true, \"message\": \"Reservation confirmed\", \"id\": \"{{ $('Insert into Supabase').item.json.id }}\" }"
+      },
+      "id": "respond-success-res",
+      "name": "Respond — Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    }
+  ],
+  "connections": {
+    "Webhook — Receive Reservation": {
+      "main": [
+        [{ "node": "Validate & Normalize", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate & Normalize": {
+      "main": [
+        [{ "node": "Insert into Supabase", "type": "main", "index": 0 }]
+      ]
+    },
+    "Insert into Supabase": {
+      "main": [
+        [
+          { "node": "Email — Customer Confirmation", "type": "main", "index": 0 },
+          { "node": "Email — Owner Notification", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Email — Customer Confirmation": {
+      "main": [
+        [{ "node": "Respond — Success", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": ["clay-and-light", "reservations"],
+  "triggerCount": 1,
+  "active": false,
+  "versionId": "1",
+  "meta": {
+    "instanceId": "clay-and-light-reservation"
+  }
+}

@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --cloud:         #F0EEE9;
+    --burgundy:      #6B1E2E;
+    --pistachio:     #6B9A5A;
+    --ink:           #1A1714;
+    --dusk:          #9E9189;
+    --pale-pistachio:#C2D6B8;
+    --deep-burgundy: #4A1220;
+  }
+
+  html {
+    background-color: #F0EEE9;
+    color: #1A1714;
+    font-family: 'Outfit', 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #F0EEE9; }
+  ::-webkit-scrollbar-thumb { background: #C2D6B8; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9E9189; }
+}
+
+@layer components {
+  .stat-card {
+    @apply bg-white rounded-lg border border-pale-pistachio p-6 shadow-sm;
+  }
+
+  .table-th {
+    @apply text-xs font-medium text-dusk uppercase tracking-wider px-4 py-3 text-left;
+  }
+
+  .table-td {
+    @apply px-4 py-3 text-sm text-ink whitespace-nowrap;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-confirmed  { @apply badge bg-pale-pistachio text-pistachio; }
+  .badge-cancelled  { @apply badge bg-red-100 text-red-700; }
+  .badge-completed  { @apply badge bg-gray-100 text-gray-700; }
+  .badge-pending    { @apply badge bg-yellow-100 text-yellow-700; }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-burgundy text-cloud rounded-md text-sm font-medium
+           hover:bg-deep-burgundy transition-colors focus:outline-none focus:ring-2 focus:ring-burgundy focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-white border border-pale-pistachio text-ink rounded-md text-sm font-medium
+           hover:bg-cloud transition-colors focus:outline-none focus:ring-2 focus:ring-pistachio focus:ring-offset-2;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-white border border-pale-pistachio rounded-md text-sm text-ink
+           placeholder:text-dusk focus:outline-none focus:ring-2 focus:ring-pistachio focus:border-pistachio transition-colors;
+  }
+
+  .select-field {
+    @apply w-full px-3 py-2 bg-white border border-pale-pistachio rounded-md text-sm text-ink
+           focus:outline-none focus:ring-2 focus:ring-pistachio focus:border-pistachio transition-colors appearance-none;
+  }
+}

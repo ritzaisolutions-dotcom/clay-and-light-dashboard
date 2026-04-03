@@ -1,0 +1,19 @@
+# Next.js
+booking-system/dashboard/.next/
+booking-system/dashboard/out/
+booking-system/dashboard/next-env.d.ts
+
+# Dependencies
+booking-system/dashboard/node_modules/
+
+# Env files
+booking-system/dashboard/.env.local
+booking-system/dashboard/.env.*.local
+
+# Vercel
+booking-system/dashboard/.vercel
+
+# Misc
+.DS_Store
+Thumbs.db
+*.pem
