@@ -1,19 +1,24 @@
-# Next.js
-booking-system/dashboard/.next/
-booking-system/dashboard/out/
-booking-system/dashboard/next-env.d.ts
-
 # Dependencies
-booking-system/dashboard/node_modules/
+node_modules/
+.pnp
+.pnp.js
 
-# Env files
-booking-system/dashboard/.env.local
-booking-system/dashboard/.env.*.local
+# Next.js
+.next/
+out/
+
+# Environment variables — NEVER commit these
+.env.local
+.env.*.local
 
 # Vercel
-booking-system/dashboard/.vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
 # Misc
 .DS_Store
-Thumbs.db
 *.pem
+npm-debug.log*
