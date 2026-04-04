@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import { upsertSetting } from '@/lib/supabase'
+import { updateSetting } from '@/lib/supabase'
 import { Save, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 
 async function sha256(text: string): Promise<string> {
@@ -37,7 +37,7 @@ export function AnalyticsPasswordForm() {
     setLoading(true)
     try {
       const hash = await sha256(newPassword)
-      await upsertSetting('analytics_password', hash)
+      await updateSetting('analytics_password', hash)
       setSaved(true)
       setNewPassword('')
       setConfirm('')
