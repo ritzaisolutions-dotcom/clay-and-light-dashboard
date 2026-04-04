@@ -1,6 +1,7 @@
 import { Header } from '@/components/layout/Header'
 import { getSettings } from '@/lib/supabase'
 import { SettingsForm } from '@/components/forms/SettingsForm'
+import { AnalyticsPasswordForm } from '@/components/forms/AnalyticsPasswordForm'
 
 export const revalidate = 0
 
@@ -19,8 +20,12 @@ export default async function SettingsPage() {
         title="Einstellungen"
         subtitle="Preise und Konfiguration"
       />
-      <div className="px-8 py-6 max-w-2xl">
+      <div className="px-8 py-6 max-w-2xl space-y-10">
         <SettingsForm initialSettings={settings} />
+        <div>
+          <h2 className="font-display text-xl text-burgundy mb-4">Zugangschutz</h2>
+          <AnalyticsPasswordForm />
+        </div>
       </div>
     </div>
   )

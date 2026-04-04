@@ -1,4 +1,5 @@
 import { Header } from '@/components/layout/Header'
+import { LogoutButton } from '@/components/layout/LogoutButton'
 import { getAnalytics } from '@/lib/supabase'
 import { RevenueAreaChart, RevenueBarChart } from '@/components/tables/RevenueChart'
 import { TrendingUp, Users, CalendarDays, UtensilsCrossed, PiggyBank } from 'lucide-react'
@@ -56,6 +57,7 @@ export default async function AnalyticsPage() {
       <Header
         title="Analytics"
         subtitle="Umsatz & Auslastungsübersicht"
+        action={<LogoutButton />}
       />
 
       <div className="px-8 py-6 space-y-8">

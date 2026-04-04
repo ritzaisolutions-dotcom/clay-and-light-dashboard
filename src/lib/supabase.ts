@@ -100,6 +100,13 @@ export async function updateSetting(key: string, value: string) {
   if (error) throw error
 }
 
+export async function upsertSetting(key: string, value: string) {
+  const { error } = await supabase
+    .from('settings')
+    .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+  if (error) throw error
+}
+
 // ── Analytics ─────────────────────────────────────────────────────────────────
 
 export async function getAnalytics(): Promise<AnalyticsSummary> {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { ConditionalSidebar } from '@/components/layout/ConditionalSidebar'
 
 export const metadata: Metadata = {
   title: 'Clay & Light — Dashboard',
@@ -29,7 +29,7 @@ export default function RootLayout({
       </head>
       <body className="bg-cloud text-ink min-h-screen font-body">
         <div className="flex h-screen overflow-hidden">
-          <Sidebar />
+          <ConditionalSidebar />
           <main className="flex-1 overflow-y-auto bg-cloud">
             {children}
           </main>
