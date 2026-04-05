@@ -37,7 +37,12 @@ export async function POST(request: Request) {
     })
     return res
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
+    const msg =
+      e instanceof Error
+        ? e.message
+        : typeof e === 'object' && e !== null && 'message' in e
+        ? String((e as { message: unknown }).message)
+        : JSON.stringify(e)
     return NextResponse.json({ error: `Server-Fehler: ${msg}` }, { status: 500 })
   }
 }

@@ -2,10 +2,11 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock } from 'lucide-react'
+import { Lock, Eye, EyeOff } from 'lucide-react'
 
 export function DashboardLoginForm() {
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -48,15 +49,24 @@ export function DashboardLoginForm() {
         <p className="text-sm text-dusk text-center mb-6">Dashboard · Bitte anmelden</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="password"
-            placeholder="Passwort"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="input-field"
-            autoFocus
-            autoComplete="current-password"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Passwort"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="input-field pr-10"
+              autoFocus
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-dusk hover:text-ink transition-colors"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
           {error && <p className="text-xs text-red-600">{error}</p>}
           <button
             type="submit"
