@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
   CalendarDays,
@@ -11,24 +11,35 @@ import {
   FileText,
   Shield,
   ExternalLink,
+  LogOut,
 } from 'lucide-react'
 import clsx from 'clsx'
 
 const navItems = [
-  { href: '/dashboard',     label: 'Übersicht',       icon: LayoutDashboard },
-  { href: '/bookings',      label: 'Töpferbuchungen', icon: CalendarDays },
+  { href: '/dashboard',     label: 'Übersicht',         icon: LayoutDashboard },
+  { href: '/bookings',      label: 'Töpferbuchungen',   icon: CalendarDays },
   { href: '/reservations',  label: 'Tischreservierung', icon: UtensilsCrossed },
-  { href: '/analytics',     label: 'Analytics',       icon: BarChart3 },
-  { href: '/settings',      label: 'Einstellungen',   icon: Settings },
+  { href: '/analytics',     label: 'Analytics',         icon: BarChart3 },
+  { href: '/settings',      label: 'Einstellungen',     icon: Settings },
 ]
 
 const legalItems = [
-  { href: '/impressum',    label: 'Impressum',   icon: FileText },
-  { href: '/datenschutz',  label: 'Datenschutz', icon: Shield },
+  { href: '/impressum',   label: 'Impressum',   icon: FileText },
+  { href: '/datenschutz', label: 'Datenschutz', icon: Shield },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const onAnalytics =
+    pathname.startsWith('/analytics') && !pathname.startsWith('/analytics/login')
+
+  async function handleLogout() {
+    await fetch('/api/analytics/logout', { method: 'POST' })
+    router.push('/analytics/login')
+    router.refresh()
+  }
 
   return (
     <aside className="w-64 flex-shrink-0 bg-deep-burgundy text-cloud flex flex-col h-full">
@@ -62,6 +73,17 @@ export function Sidebar() {
             </Link>
           )
         })}
+
+        {/* Logout — only shown when inside Analytics */}
+        {onAnalytics && (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-pale-pistachio/80 hover:bg-burgundy/40 hover:text-cloud mt-0.5"
+          >
+            <LogOut size={16} />
+            Abmelden
+          </button>
+        )}
 
         <div className="pt-4 mt-4 border-t border-burgundy/30">
           <p className="px-3 pb-2 text-xs text-pale-pistachio/40 uppercase tracking-wider">
