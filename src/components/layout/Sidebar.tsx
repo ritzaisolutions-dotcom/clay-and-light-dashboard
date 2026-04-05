@@ -97,7 +97,7 @@ export function Sidebar() {
           className="flex items-center gap-2 text-xs text-pale-pistachio/50 hover:text-pale-pistachio transition-colors"
         >
           <ExternalLink size={12} />
-          clayandlight.at
+          clay-and-light.vercel.app
         </a>
       </div>
     </aside>
