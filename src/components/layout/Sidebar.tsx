@@ -32,12 +32,9 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
 
-  const onAnalytics =
-    pathname.startsWith('/analytics') && !pathname.startsWith('/analytics/login')
-
   async function handleLogout() {
     await fetch('/api/analytics/logout', { method: 'POST' })
-    router.push('/analytics/login')
+    router.push('/login')
     router.refresh()
   }
 
@@ -74,16 +71,13 @@ export function Sidebar() {
           )
         })}
 
-        {/* Logout — only shown when inside Analytics */}
-        {onAnalytics && (
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-pale-pistachio/80 hover:bg-burgundy/40 hover:text-cloud mt-0.5"
-          >
-            <LogOut size={16} />
-            Abmelden
-          </button>
-        )}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-pale-pistachio/80 hover:bg-burgundy/40 hover:text-cloud mt-0.5"
+        >
+          <LogOut size={16} />
+          Abmelden
+        </button>
 
         <div className="pt-4 mt-4 border-t border-burgundy/30">
           <p className="px-3 pb-2 text-xs text-pale-pistachio/40 uppercase tracking-wider">
