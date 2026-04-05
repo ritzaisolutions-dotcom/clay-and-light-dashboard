@@ -91,7 +91,7 @@ export function Sidebar() {
       {/* Footer */}
       <div className="px-6 py-4 border-t border-burgundy/30">
         <a
-          href="https://clayandlight.at"
+          href="https://clay-and-light.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-pale-pistachio/50 hover:text-pale-pistachio transition-colors"

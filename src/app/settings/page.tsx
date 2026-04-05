@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-export const metadata: Metadata = { title: 'Einstellungen' }
-
 import { Header } from '@/components/layout/Header'
 import { getSettings } from '@/lib/supabase'
 import { SettingsForm } from '@/components/forms/SettingsForm'
 import { AnalyticsPasswordForm } from '@/components/forms/AnalyticsPasswordForm'
 
+export const metadata: Metadata = { title: 'Einstellungen' }
 export const revalidate = 0
 
 export default async function SettingsPage() {

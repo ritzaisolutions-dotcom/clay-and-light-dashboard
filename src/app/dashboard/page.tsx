@@ -1,19 +1,12 @@
 import type { Metadata } from 'next'
-export const metadata: Metadata = { title: 'Übersicht' }
-
-import { Header } from '@/components/layout/Header'
-import { getPotteryBookings, getReservations, getAnalytics } from '@/lib/supabase'
+import Link from 'next/link'
 import { format } from 'date-fns'
 import { de } from 'date-fns/locale'
-import Link from 'next/link'
-import {
-  TrendingUp,
-  Users,
-  CalendarDays,
-  UtensilsCrossed,
-  ArrowRight,
-} from 'lucide-react'
+import { TrendingUp, Users, CalendarDays, UtensilsCrossed, ArrowRight } from 'lucide-react'
+import { Header } from '@/components/layout/Header'
+import { getPotteryBookings, getReservations, getAnalytics } from '@/lib/supabase'
 
+export const metadata: Metadata = { title: 'Übersicht' }
 export const revalidate = 60
 
 export default async function DashboardPage() {
@@ -62,7 +55,6 @@ export default async function DashboardPage() {
       />
 
       <div className="px-8 py-6 space-y-8">
-        {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map(({ label, value, icon: Icon, color, bg }) => (
             <div key={label} className="stat-card">
@@ -75,7 +67,6 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        {/* Combined Revenue Hero */}
         <div className="bg-deep-burgundy rounded-lg p-6 text-cloud">
           <p className="text-sm text-pale-pistachio/70 uppercase tracking-wider mb-1">
             Gesamtumsatz
@@ -84,18 +75,12 @@ export default async function DashboardPage() {
             € {(analytics?.combinedRevenue ?? 0).toFixed(0)}
           </p>
           <div className="flex gap-6 mt-4 text-sm text-pale-pistachio/70">
-            <span>
-              Ø Töpfergruppe: {(analytics?.avgPotteryPersons ?? 0).toFixed(1)} Pers.
-            </span>
-            <span>
-              Ø Tischgruppe: {(analytics?.avgReservationPersons ?? 0).toFixed(1)} Pers.
-            </span>
+            <span>Ø Töpfergruppe: {(analytics?.avgPotteryPersons ?? 0).toFixed(1)} Pers.</span>
+            <span>Ø Tischgruppe: {(analytics?.avgReservationPersons ?? 0).toFixed(1)} Pers.</span>
           </div>
         </div>
 
-        {/* Recent tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Bookings */}
           <div className="bg-white rounded-lg border border-pale-pistachio overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-pale-pistachio">
               <h2 className="font-display text-lg text-burgundy">Letzte Buchungen</h2>
@@ -125,7 +110,6 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent Reservations */}
           <div className="bg-white rounded-lg border border-pale-pistachio overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-pale-pistachio">
               <h2 className="font-display text-lg text-burgundy">Letzte Reservierungen</h2>

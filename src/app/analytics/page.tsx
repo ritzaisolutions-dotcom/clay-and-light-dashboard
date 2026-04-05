@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
-export const metadata: Metadata = { title: 'Analytics' }
-
+import { TrendingUp, Users, CalendarDays, UtensilsCrossed, PiggyBank } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { LogoutButton } from '@/components/layout/LogoutButton'
 import { getAnalytics } from '@/lib/supabase'
 import { RevenueAreaChart, RevenueBarChart } from '@/components/tables/RevenueChart'
-import { TrendingUp, Users, CalendarDays, UtensilsCrossed, PiggyBank } from 'lucide-react'
 
+export const metadata: Metadata = { title: 'Analytics' }
 export const revalidate = 60
 
 export default async function AnalyticsPage() {
