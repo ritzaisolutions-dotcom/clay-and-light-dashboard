@@ -36,7 +36,8 @@ export async function POST(request: Request) {
       // No maxAge = session cookie: deleted when browser is closed
     })
     return res
-  } catch {
-    return NextResponse.json({ error: 'Server-Fehler.' }, { status: 500 })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return NextResponse.json({ error: `Server-Fehler: ${msg}` }, { status: 500 })
   }
 }
