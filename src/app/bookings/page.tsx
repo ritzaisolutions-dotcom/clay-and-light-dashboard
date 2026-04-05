@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Töpferbuchungen' }
+
 import { Header } from '@/components/layout/Header'
 import { BookingsTable } from '@/components/tables/BookingsTable'
 import { getPotteryBookings } from '@/lib/supabase'

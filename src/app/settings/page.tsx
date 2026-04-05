@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Einstellungen' }
+
 import { Header } from '@/components/layout/Header'
 import { getSettings } from '@/lib/supabase'
 import { SettingsForm } from '@/components/forms/SettingsForm'

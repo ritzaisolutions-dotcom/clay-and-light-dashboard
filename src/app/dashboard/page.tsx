@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Übersicht' }
+
 import { Header } from '@/components/layout/Header'
 import { getPotteryBookings, getReservations, getAnalytics } from '@/lib/supabase'
 import { format } from 'date-fns'

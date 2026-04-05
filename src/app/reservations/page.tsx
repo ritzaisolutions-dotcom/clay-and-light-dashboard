@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Tischreservierungen' }
+
 import { Header } from '@/components/layout/Header'
 import { ReservationsTable } from '@/components/tables/ReservationsTable'
 import { getReservations } from '@/lib/supabase'

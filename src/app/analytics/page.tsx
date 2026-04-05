@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Analytics' }
+
 import { Header } from '@/components/layout/Header'
 import { LogoutButton } from '@/components/layout/LogoutButton'
 import { getAnalytics } from '@/lib/supabase'
