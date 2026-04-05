@@ -21,7 +21,9 @@ export async function POST(request: Request) {
 
     const inputHash = createHash('sha256').update(password).digest('hex')
 
-    if (inputHash !== storedHash) {
+    // Accept both SHA-256 hashed and plaintext stored passwords
+    const matches = inputHash === storedHash || password === storedHash
+    if (!matches) {
       return NextResponse.json({ error: 'Falsches Passwort.' }, { status: 401 })
     }
 
