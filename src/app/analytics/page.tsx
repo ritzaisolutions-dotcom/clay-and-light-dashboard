@@ -32,8 +32,8 @@ export default async function AnalyticsPage() {
       value: `€ ${(analytics?.combinedRevenue ?? 0).toFixed(2)}`,
       icon: PiggyBank,
       note: 'Töpfern + Tisch',
-      color: 'text-deep-burgundy',
-      border: 'border-l-deep-burgundy',
+      color: 'text-ink',
+      border: 'border-l-sage',
     },
     {
       label: 'Ø Personen / Töpferbuchung',
@@ -78,8 +78,8 @@ export default async function AnalyticsPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg border border-pale-pistachio p-6">
-            <h2 className="font-display text-lg text-burgundy mb-4">
+          <div className="bg-warm-linen rounded-lg border border-border p-6">
+            <h2 className="font-display text-lg text-ink mb-4">
               Umsatz über Zeit (Fläche)
             </h2>
             {(analytics?.monthlyData?.length ?? 0) === 0 ? (
@@ -91,8 +91,8 @@ export default async function AnalyticsPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-lg border border-pale-pistachio p-6">
-            <h2 className="font-display text-lg text-burgundy mb-4">
+          <div className="bg-warm-linen rounded-lg border border-border p-6">
+            <h2 className="font-display text-lg text-ink mb-4">
               Umsatz über Zeit (gestapelt)
             </h2>
             {(analytics?.monthlyData?.length ?? 0) === 0 ? (
@@ -106,13 +106,13 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Revenue breakdown table */}
-        <div className="bg-white rounded-lg border border-pale-pistachio overflow-hidden">
-          <div className="px-6 py-4 border-b border-pale-pistachio">
-            <h2 className="font-display text-lg text-burgundy">Monatsübersicht</h2>
+        <div className="bg-warm-linen rounded-lg border border-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-border">
+            <h2 className="font-display text-lg text-ink">Monatsübersicht</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-cloud border-b border-pale-pistachio">
+              <thead className="bg-cloud border-b border-border">
                 <tr>
                   <th className="table-th">Monat</th>
                   <th className="table-th">Töpfern</th>
@@ -120,7 +120,7 @@ export default async function AnalyticsPage() {
                   <th className="table-th">Gesamt</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-pale-pistachio/50">
+              <tbody className="divide-y divide-border/70">
                 {(analytics?.monthlyData ?? []).length === 0 ? (
                   <tr>
                     <td colSpan={4} className="text-center py-8 text-dusk text-sm">
@@ -131,7 +131,7 @@ export default async function AnalyticsPage() {
                   [...(analytics?.monthlyData ?? [])]
                     .reverse()
                     .map(row => (
-                      <tr key={row.month} className="hover:bg-cloud/50">
+                      <tr key={row.month} className="hover:bg-cloud/70">
                         <td className="table-td font-medium">{row.month}</td>
                         <td className="table-td text-pistachio">€ {row.pottery.toFixed(2)}</td>
                         <td className="table-td text-burgundy">€ {row.reservations.toFixed(2)}</td>

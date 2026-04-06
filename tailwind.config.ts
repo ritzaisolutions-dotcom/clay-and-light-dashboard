@@ -9,14 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Clay & Light brand palette
-        cloud:        '#F0EEE9',
-        burgundy:     '#6B1E2E',
-        pistachio:    '#6B9A5A',
-        ink:          '#1A1714',
-        dusk:         '#9E9189',
-        'pale-pistachio': '#C2D6B8',
-        'deep-burgundy':  '#4A1220',
+        // Main-site palette from brand.md
+        cloud:        '#F5F2EC',
+        'warm-linen': '#FBF8F3',
+        burgundy:     '#EC6A37',
+        'deep-burgundy': '#F37A48',
+        sage:         '#A9B494',
+        pistachio:    '#6F7F5F',
+        ink:          '#2F2A24',
+        dusk:         '#7B746B',
+        border:       '#D9D1C7',
+        'pale-pistachio': '#D9D1C7',
       },
       fontFamily: {
         display: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],

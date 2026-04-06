@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: '%s · Clay & Light',
   },
   description: 'Booking & reservation management for Clay & Light',
-  icons: { icon: '/favicon.svg' },
+  icons: { icon: '/favicon.png' },
 }
 
 export default function RootLayout({

@@ -67,28 +67,28 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        <div className="bg-deep-burgundy rounded-lg p-6 text-cloud">
-          <p className="text-sm text-pale-pistachio/70 uppercase tracking-wider mb-1">
+        <div className="rounded-lg border border-border bg-warm-linen p-6 text-ink">
+          <p className="text-sm text-dusk uppercase tracking-wider mb-1">
             Gesamtumsatz
           </p>
-          <p className="font-display text-5xl text-cloud">
+          <p className="font-display text-5xl text-ink">
             € {(analytics?.combinedRevenue ?? 0).toFixed(0)}
           </p>
-          <div className="flex gap-6 mt-4 text-sm text-pale-pistachio/70">
+          <div className="flex gap-6 mt-4 text-sm text-dusk">
             <span>Ø Töpfergruppe: {(analytics?.avgPotteryPersons ?? 0).toFixed(1)} Pers.</span>
             <span>Ø Tischgruppe: {(analytics?.avgReservationPersons ?? 0).toFixed(1)} Pers.</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg border border-pale-pistachio overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-pale-pistachio">
-              <h2 className="font-display text-lg text-burgundy">Letzte Buchungen</h2>
+          <div className="bg-warm-linen rounded-lg border border-border overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <h2 className="font-display text-lg text-ink">Letzte Buchungen</h2>
               <Link href="/bookings" className="text-xs text-pistachio flex items-center gap-1 hover:underline">
                 Alle <ArrowRight size={12} />
               </Link>
             </div>
-            <div className="divide-y divide-pale-pistachio/50">
+            <div className="divide-y divide-border/70">
               {recentBookings.length === 0 ? (
                 <p className="px-5 py-8 text-sm text-dusk text-center">Keine Buchungen vorhanden.</p>
               ) : (
@@ -110,14 +110,14 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-pale-pistachio overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-pale-pistachio">
-              <h2 className="font-display text-lg text-burgundy">Letzte Reservierungen</h2>
+          <div className="bg-warm-linen rounded-lg border border-border overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <h2 className="font-display text-lg text-ink">Letzte Reservierungen</h2>
               <Link href="/reservations" className="text-xs text-pistachio flex items-center gap-1 hover:underline">
                 Alle <ArrowRight size={12} />
               </Link>
             </div>
-            <div className="divide-y divide-pale-pistachio/50">
+            <div className="divide-y divide-border/70">
               {recentReservations.length === 0 ? (
                 <p className="px-5 py-8 text-sm text-dusk text-center">Keine Reservierungen vorhanden.</p>
               ) : (

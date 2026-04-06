@@ -38,25 +38,25 @@ export function RevenueAreaChart({ data }: Props) {
       <AreaChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="colorPottery" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#6B9A5A" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#6B9A5A" stopOpacity={0.02} />
+            <stop offset="5%" stopColor="#6F7F5F" stopOpacity={0.28} />
+            <stop offset="95%" stopColor="#6F7F5F" stopOpacity={0.03} />
           </linearGradient>
           <linearGradient id="colorReservations" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#6B1E2E" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#6B1E2E" stopOpacity={0.02} />
+            <stop offset="5%" stopColor="#EC6A37" stopOpacity={0.22} />
+            <stop offset="95%" stopColor="#EC6A37" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#C2D6B8" strokeOpacity={0.5} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#D9D1C7" strokeOpacity={0.8} />
         <XAxis
           dataKey="month"
           tickFormatter={formatMonth}
-          tick={{ fontSize: 11, fill: '#9E9189' }}
+          tick={{ fontSize: 11, fill: '#7B746B' }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           tickFormatter={euroFormatter}
-          tick={{ fontSize: 11, fill: '#9E9189' }}
+          tick={{ fontSize: 11, fill: '#7B746B' }}
           axisLine={false}
           tickLine={false}
           width={60}
@@ -68,27 +68,27 @@ export function RevenueAreaChart({ data }: Props) {
           ]}
           labelFormatter={formatMonth}
           contentStyle={{
-            background: '#fff',
-            border: '1px solid #C2D6B8',
+            background: '#FBF8F3',
+            border: '1px solid #D9D1C7',
             borderRadius: 6,
             fontSize: 12,
           }}
         />
         <Legend
           formatter={(value) => value === 'pottery' ? 'Töpfern' : 'Tisch'}
-          wrapperStyle={{ fontSize: 12, color: '#9E9189' }}
+          wrapperStyle={{ fontSize: 12, color: '#7B746B' }}
         />
         <Area
           type="monotone"
           dataKey="pottery"
-          stroke="#6B9A5A"
+          stroke="#6F7F5F"
           strokeWidth={2}
           fill="url(#colorPottery)"
         />
         <Area
           type="monotone"
           dataKey="reservations"
-          stroke="#6B1E2E"
+          stroke="#EC6A37"
           strokeWidth={2}
           fill="url(#colorReservations)"
         />
@@ -101,17 +101,17 @@ export function RevenueBarChart({ data }: Props) {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#C2D6B8" strokeOpacity={0.5} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#D9D1C7" strokeOpacity={0.8} />
         <XAxis
           dataKey="month"
           tickFormatter={formatMonth}
-          tick={{ fontSize: 11, fill: '#9E9189' }}
+          tick={{ fontSize: 11, fill: '#7B746B' }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           tickFormatter={euroFormatter}
-          tick={{ fontSize: 11, fill: '#9E9189' }}
+          tick={{ fontSize: 11, fill: '#7B746B' }}
           axisLine={false}
           tickLine={false}
           width={60}
@@ -123,18 +123,18 @@ export function RevenueBarChart({ data }: Props) {
           ]}
           labelFormatter={formatMonth}
           contentStyle={{
-            background: '#fff',
-            border: '1px solid #C2D6B8',
+            background: '#FBF8F3',
+            border: '1px solid #D9D1C7',
             borderRadius: 6,
             fontSize: 12,
           }}
         />
         <Legend
           formatter={(value) => value === 'pottery' ? 'Töpfern' : 'Tisch'}
-          wrapperStyle={{ fontSize: 12, color: '#9E9189' }}
+          wrapperStyle={{ fontSize: 12, color: '#7B746B' }}
         />
-        <Bar dataKey="pottery" stackId="a" fill="#6B9A5A" radius={[0, 0, 0, 0]} />
-        <Bar dataKey="reservations" stackId="a" fill="#6B1E2E" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="pottery" stackId="a" fill="#6F7F5F" radius={[0, 0, 0, 0]} />
+        <Bar dataKey="reservations" stackId="a" fill="#EC6A37" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

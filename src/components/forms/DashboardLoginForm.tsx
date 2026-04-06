@@ -39,13 +39,13 @@ export function DashboardLoginForm() {
 
   return (
     <div className="fixed inset-0 bg-cloud flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg border border-pale-pistachio p-8 w-full max-w-sm shadow-sm">
+      <div className="bg-warm-linen rounded-lg border border-border p-8 w-full max-w-sm shadow-sm">
         <div className="flex justify-center mb-6">
           <div className="inline-flex p-3 rounded-full bg-burgundy/10">
             <Lock size={22} className="text-burgundy" />
           </div>
         </div>
-        <h1 className="font-display text-2xl text-burgundy text-center mb-1">Clay & Light</h1>
+        <h1 className="font-display text-2xl text-ink text-center mb-1">Clay & Light</h1>
         <p className="text-sm text-dusk text-center mb-6">Dashboard · Bitte anmelden</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

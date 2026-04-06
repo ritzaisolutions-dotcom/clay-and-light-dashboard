@@ -39,12 +39,12 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-deep-burgundy text-cloud flex flex-col h-full">
+    <aside className="w-64 flex-shrink-0 bg-warm-linen text-ink flex flex-col h-full border-r border-border">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-burgundy/50">
+      <div className="px-6 py-6 border-b border-border">
         <Link href="/dashboard" className="block">
-          <p className="font-display text-xl text-cloud leading-tight">Clay & Light</p>
-          <p className="text-xs text-pale-pistachio/70 tracking-widest uppercase mt-0.5">
+          <p className="font-display text-xl text-ink leading-tight">Clay & Light</p>
+          <p className="text-xs text-dusk tracking-widest uppercase mt-0.5">
             Kaffee. Ton. Stille.
           </p>
         </Link>
@@ -61,8 +61,8 @@ export function Sidebar() {
               className={clsx(
                 'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors',
                 active
-                  ? 'bg-burgundy text-cloud font-medium'
-                  : 'text-pale-pistachio/80 hover:bg-burgundy/40 hover:text-cloud'
+                  ? 'bg-burgundy text-cloud font-medium shadow-sm'
+                  : 'text-dusk hover:bg-sage/20 hover:text-ink'
               )}
             >
               <Icon size={16} />
@@ -73,14 +73,14 @@ export function Sidebar() {
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-pale-pistachio/80 hover:bg-burgundy/40 hover:text-cloud mt-0.5"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-dusk hover:bg-sage/20 hover:text-ink mt-0.5"
         >
           <LogOut size={16} />
           Abmelden
         </button>
 
-        <div className="pt-4 mt-4 border-t border-burgundy/30">
-          <p className="px-3 pb-2 text-xs text-pale-pistachio/40 uppercase tracking-wider">
+        <div className="pt-4 mt-4 border-t border-border">
+          <p className="px-3 pb-2 text-xs text-dusk/70 uppercase tracking-wider">
             Rechtliches
           </p>
           {legalItems.map(({ href, label, icon: Icon }) => {
@@ -92,8 +92,8 @@ export function Sidebar() {
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors',
                   active
-                    ? 'bg-burgundy text-cloud font-medium'
-                    : 'text-pale-pistachio/60 hover:bg-burgundy/40 hover:text-cloud'
+                    ? 'bg-burgundy text-cloud font-medium shadow-sm'
+                    : 'text-dusk hover:bg-sage/20 hover:text-ink'
                 )}
               >
                 <Icon size={16} />
@@ -105,12 +105,12 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-burgundy/30">
+      <div className="px-6 py-4 border-t border-border">
         <a
           href="https://clay-and-light.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs text-pale-pistachio/50 hover:text-pale-pistachio transition-colors"
+          className="flex items-center gap-2 text-xs text-dusk hover:text-burgundy transition-colors"
         >
           <ExternalLink size={12} />
           clay-and-light.vercel.app
