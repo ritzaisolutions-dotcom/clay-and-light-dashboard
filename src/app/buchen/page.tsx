@@ -19,7 +19,7 @@ export default async function BuchenPage() {
         <div className="text-center mb-8">
           <h1 className="font-display text-4xl text-burgundy mb-2">Töpferkurs buchen</h1>
           <p className="text-dusk text-sm leading-relaxed">
-            110 Minuten Töpfern, Glasieren und Brennen – für dich und deine Gruppe.
+            150 Minuten Töpfern, Glasieren und Brennen – donnerstags und sonntags.
           </p>
         </div>
         <PotteryBookingForm

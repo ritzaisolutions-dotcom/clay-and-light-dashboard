@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState, useMemo } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 
 interface FormData {
   name: string
   email: string
   phone: string
-  timeslot: string
+  booking_date: string
+  booking_slot: string
   persons: number
   notes: string
   marketing_consent: boolean
@@ -17,6 +18,26 @@ interface FormData {
 interface Props {
   webhookUrl: string
   pricePerPerson?: number
+}
+
+// Pottery sessions are Thursdays (4) and Sundays (0) only
+const POTTERY_DAYS = new Set([0, 4])
+
+// Fixed 150-minute slots: [label, startTime as HH:MM]
+const SLOTS = [
+  { label: 'Slot 1 – 10:00 bis 12:30', value: '10:00' },
+  { label: 'Slot 2 – 13:00 bis 15:30', value: '13:00' },
+  { label: 'Slot 3 – 16:00 bis 18:30', value: '16:00' },
+]
+
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function isPotteryDay(dateStr: string): boolean {
+  if (!dateStr) return false
+  const d = new Date(dateStr + 'T00:00:00')
+  return POTTERY_DAYS.has(d.getDay())
 }
 
 export function PotteryBookingForm({ webhookUrl, pricePerPerson = 45 }: Props) {
@@ -28,20 +49,35 @@ export function PotteryBookingForm({ webhookUrl, pricePerPerson = 45 }: Props) {
     register,
     handleSubmit,
     watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<FormData>({ defaultValues: { persons: 1 } })
 
   const personsCount = Number(watch('persons') || 1)
+  const selectedDate = watch('booking_date')
   const totalPrice = personsCount * pricePerPerson
+  const isValidDay = useMemo(() => isPotteryDay(selectedDate), [selectedDate])
 
   async function onSubmit(data: FormData) {
     setState('loading')
     try {
+      // Build ISO 8601 timeslot from date + slot start time
+      const timeslot = new Date(`${data.booking_date}T${data.booking_slot}:00`).toISOString()
       const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, price_per_person: pricePerPerson }),
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone ?? null,
+          timeslot,
+          persons: Number(data.persons),
+          notes: data.notes ?? null,
+          marketing_consent: Boolean(data.marketing_consent),
+          price_per_person: pricePerPerson,
+          total_price: totalPrice,
+        }),
       })
       const json = await res.json()
       if (!res.ok || !json.success) throw new Error(json.error || 'Unbekannter Fehler')
@@ -128,16 +164,63 @@ export function PotteryBookingForm({ webhookUrl, pricePerPerson = 45 }: Props) {
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Termin (110 Min.) <span className="text-burgundy">*</span>
+            Datum <span className="text-burgundy">*</span>
           </label>
           <input
-            type="datetime-local"
-            {...register('timeslot', { required: 'Bitte wähle einen Termin' })}
+            type="date"
+            {...register('booking_date', {
+              required: 'Bitte wähle ein Datum',
+              validate: (v) =>
+                isPotteryDay(v) || 'Töpfern ist nur donnerstags und sonntags möglich',
+            })}
             className="input-field"
-            step={110 * 60}
+            min={getTodayStr()}
           />
-          {errors.timeslot && (
-            <p className="text-xs text-red-600 mt-1">{errors.timeslot.message}</p>
+          {errors.booking_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.booking_date.message}</p>
+          )}
+          {selectedDate && !isValidDay && (
+            <p className="text-xs text-amber-600 mt-1">
+              Töpfern ist nur donnerstags und sonntags möglich.
+            </p>
+          )}
+          {selectedDate && isValidDay && (
+            <p className="text-xs text-pistachio mt-1">Töpfertag ✓</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-ink mb-1.5">
+            Zeitslot (150 Min.) <span className="text-burgundy">*</span>
+          </label>
+          <Controller
+            name="booking_slot"
+            control={control}
+            rules={{ required: 'Bitte wähle einen Zeitslot' }}
+            render={({ field }) => (
+              <select
+                {...field}
+                className="input-field"
+                disabled={!selectedDate || !isValidDay}
+              >
+                <option value="">
+                  {!selectedDate
+                    ? 'Erst Datum wählen'
+                    : !isValidDay
+                    ? 'Kein Töpfertag'
+                    : 'Zeitslot wählen'}
+                </option>
+                {isValidDay &&
+                  SLOTS.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+              </select>
+            )}
+          />
+          {errors.booking_slot && (
+            <p className="text-xs text-red-600 mt-1">{errors.booking_slot.message}</p>
           )}
         </div>
 

@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState, useMemo } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 
 interface FormData {
   name: string
   email: string
   phone: string
-  reservation_time: string
+  reservation_date: string
+  reservation_slot: string
   persons: number
   notes: string
   marketing_consent: boolean
@@ -18,6 +19,49 @@ interface Props {
   webhookUrl: string
 }
 
+// Opening hours per day (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)
+// null = closed; [openHour, lastSlotHour] where lastSlot = closing - 1h
+const HOURS: Record<number, [number, number] | null> = {
+  0: [9, 17],    // Sun: 09:00–18:00 close, last slot at 17:00 (before 18:00)
+  1: null,       // Mon: closed
+  2: [9, 17],    // Tue
+  3: [9, 17],    // Wed
+  4: [9, 17],    // Thu
+  5: [11, 21],   // Fri: 11:00–22:00 close, last slot at 21:00 (before 22:00)
+  6: [11, 21],   // Sat
+}
+
+function getDateMin() {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() + 15)
+  return now.toISOString().slice(0, 10)
+}
+
+function generateSlots(dateStr: string): string[] {
+  if (!dateStr) return []
+  const d = new Date(dateStr + 'T00:00:00')
+  const dow = d.getDay()
+  const hours = HOURS[dow]
+  if (!hours) return []
+  const [startH, endH] = hours
+  const slots: string[] = []
+  for (let h = startH; h <= endH; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      if (h === endH && m > 0) break
+      const hh = String(h).padStart(2, '0')
+      const mm = String(m).padStart(2, '0')
+      slots.push(`${hh}:${mm}`)
+    }
+  }
+  return slots
+}
+
+function isDayClosed(dateStr: string): boolean {
+  if (!dateStr) return false
+  const d = new Date(dateStr + 'T00:00:00')
+  return HOURS[d.getDay()] === null
+}
+
 export function ReservationForm({ webhookUrl }: Props) {
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -25,17 +69,33 @@ export function ReservationForm({ webhookUrl }: Props) {
   const {
     register,
     handleSubmit,
+    watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<FormData>({ defaultValues: { persons: 2 } })
 
+  const selectedDate = watch('reservation_date')
+  const slots = useMemo(() => generateSlots(selectedDate), [selectedDate])
+  const closed = isDayClosed(selectedDate)
+
   async function onSubmit(data: FormData) {
     setState('loading')
     try {
+      // Combine date + time into ISO 8601 for the API
+      const reservation_time = new Date(`${data.reservation_date}T${data.reservation_slot}:00`).toISOString()
       const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          reservation_time,
+          persons: data.persons,
+          notes: data.notes,
+          marketing_consent: data.marketing_consent,
+        }),
       })
       const json = await res.json()
       if (!res.ok || !json.success) throw new Error(json.error || 'Unbekannter Fehler')
@@ -118,15 +178,53 @@ export function ReservationForm({ webhookUrl }: Props) {
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Datum &amp; Uhrzeit <span className="text-burgundy">*</span>
+            Datum <span className="text-burgundy">*</span>
           </label>
           <input
-            type="datetime-local"
-            {...register('reservation_time', { required: 'Bitte wähle Datum und Uhrzeit' })}
+            type="date"
+            {...register('reservation_date', { required: 'Bitte wähle ein Datum' })}
             className="input-field"
+            min={getDateMin()}
           />
-          {errors.reservation_time && (
-            <p className="text-xs text-red-600 mt-1">{errors.reservation_time.message}</p>
+          {errors.reservation_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.reservation_date.message}</p>
+          )}
+          {closed && selectedDate && (
+            <p className="text-xs text-amber-600 mt-1">Montags sind wir leider geschlossen. Bitte wähle einen anderen Tag.</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-ink mb-1.5">
+            Uhrzeit <span className="text-burgundy">*</span>
+          </label>
+          <Controller
+            name="reservation_slot"
+            control={control}
+            rules={{ required: 'Bitte wähle eine Uhrzeit' }}
+            render={({ field }) => (
+              <select
+                {...field}
+                className="input-field"
+                disabled={!selectedDate || closed || slots.length === 0}
+              >
+                <option value="">
+                  {!selectedDate
+                    ? 'Erst Datum wählen'
+                    : closed
+                    ? 'Kein Betrieb'
+                    : 'Uhrzeit wählen'}
+                </option>
+                {slots.map((s) => (
+                  <option key={s} value={s}>
+                    {s} Uhr
+                  </option>
+                ))}
+              </select>
+            )}
+          />
+          {errors.reservation_slot && (
+            <p className="text-xs text-red-600 mt-1">{errors.reservation_slot.message}</p>
           )}
         </div>
 
