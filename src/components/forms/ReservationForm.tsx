@@ -11,6 +11,7 @@ interface FormData {
   reservation_time: string
   persons: number
   notes: string
+  marketing_consent: boolean
 }
 
 interface Props {
@@ -160,12 +161,30 @@ export function ReservationForm({ webhookUrl }: Props) {
         </div>
       </div>
 
+      {/* GDPR marketing consent — optional, separate from booking data processing */}
+      <div className="flex gap-3 items-start p-4 bg-cloud rounded-lg border border-pale-pistachio">
+        <input
+          type="checkbox"
+          id="res_marketing_consent"
+          {...register('marketing_consent')}
+          className="mt-0.5 w-4 h-4 accent-pistachio"
+        />
+        <label htmlFor="res_marketing_consent" className="text-xs text-dusk leading-relaxed">
+          Ich stimme zu, dass Clay &amp; Light mir gelegentlich Newsletter und
+          Sonderangebote per E-Mail zusenden darf. Diese Einwilligung kann ich
+          jederzeit widerrufen.{' '}
+          <a href="/datenschutz" className="text-pistachio hover:underline" target="_blank">
+            Datenschutzerklärung
+          </a>
+        </label>
+      </div>
+
       <p className="text-xs text-dusk">
-        Mit dem Absenden akzeptierst du unsere{' '}
+        Deine Daten werden ausschließlich zur Bearbeitung deiner Reservierung
+        verwendet (Art. 6 Abs. 1 lit. b DSGVO).{' '}
         <a href="/datenschutz" className="text-pistachio hover:underline" target="_blank">
           Datenschutzerklärung
         </a>
-        .
       </p>
 
       <button

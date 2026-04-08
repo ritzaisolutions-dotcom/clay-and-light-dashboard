@@ -1,0 +1,199 @@
+{
+  "name": "clay-and-light_reservations",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "table-reservation",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "3b25a6e0-a00d-4e1c-9425-88e6d8ae4448",
+      "name": "Webhook — Receive Reservation1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [-1552, 592],
+      "webhookId": "4b6cd528-860e-492e-a1d0-47bb646d7448"
+    },
+    {
+      "parameters": {
+        "jsCode": "  let body;\n  const input = $input.first().json;\n\n  // ── Secret verification ──────────────────────────────────────────────\n  // Reject any request that did not come through the Next.js API proxy.\n  // Set WEBHOOK_SECRET in n8n Settings → Environment variables.\n  const incoming = (input.headers || {})['x-webhook-secret'];\n  const expected = $env.WEBHOOK_SECRET;\n  if (!expected) throw new Error('Server misconfiguration: WEBHOOK_SECRET env var not set in n8n');\n  if (incoming !== expected) throw new Error('Unauthorized: invalid or missing webhook secret');\n\n  if (typeof input.body === 'string') {\n    try { body = JSON.parse(input.body); }\n    catch(e) { throw new Error('Could not parse body: ' + e.message); }\n  } else if (input.body && typeof input.body === 'object') {\n    body = input.body;\n  } else if (input.name || input.email || input.reservation_time) {\n    body = input;\n  } else {\n    throw new Error('Unexpected input: ' + JSON.stringify(input).slice(0, 300));\n  }\n\n  const required = ['name', 'email', 'reservation_time', 'persons'];\n  const missing = required.filter(f => !body[f]);\n  if (missing.length > 0) throw new Error(`Missing required fields: ${missing.join(', ')}`);\n\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(body.email)) throw new Error('Invalid email address');\n\n  const persons = parseInt(body.persons);\n  if (persons < 1 || persons > 50) throw new Error('Persons must be between 1 and 50');\n\n  const avgSpend = parseFloat(body.avg_spend_per_person) || 25;\n  const resDate = new Date(body.reservation_time);\n  const reminderAt = new Date(resDate.getTime() - 24 * 60 * 60 * 1000);\n\n  return [{\n    json: {\n      id: body.reservation_id,\n      name: body.name.trim(),\n      email: body.email.trim().toLowerCase(),\n      phone: body.phone || null,\n      reservation_time: resDate.toISOString(),\n      persons,\n      notes: body.notes || null,\n      marketing_consent: body.marketing_consent === true || body.marketing_consent === 'true',\n      avg_spend_per_person: avgSpend,\n      estimated_revenue: persons * avgSpend,\n      status: 'confirmed',\n      reminderAt: reminderAt.toISOString(),\n      formattedTime: resDate.toLocaleString('de-AT', {\n        timeZone: 'Europe/Vienna', weekday: 'long', year: 'numeric',\n        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'\n      })\n    }\n  }];"
+      },
+      "id": "e42951ad-b9d2-4587-bcef-7b387c9c05f2",
+      "name": "Validate & Normalize1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1312, 592]
+    },
+    {
+      "parameters": {
+        "tableId": "reservations",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldId": "id",                  "fieldValue": "={{ $json.id }}" },
+            { "fieldId": "name",                "fieldValue": "={{ $json.name }}" },
+            { "fieldId": "email",               "fieldValue": "={{ $json.email }}" },
+            { "fieldId": "phone",               "fieldValue": "={{ $json.phone }}" },
+            { "fieldId": "reservation_time",    "fieldValue": "={{ $json.reservation_time }}" },
+            { "fieldId": "persons",             "fieldValue": "={{ $json.persons }}" },
+            { "fieldId": "notes",               "fieldValue": "={{ $json.notes }}" },
+            { "fieldId": "marketing_consent",   "fieldValue": "={{ $json.marketing_consent }}" },
+            { "fieldId": "avg_spend_per_person","fieldValue": "={{ $json.avg_spend_per_person }}" },
+            { "fieldId": "estimated_revenue",   "fieldValue": "={{ $json.estimated_revenue }}" },
+            { "fieldId": "status",              "fieldValue": "={{ $json.status }}" }
+          ]
+        }
+      },
+      "id": "5f383c00-fd8c-4eb4-912a-69167a8c504f",
+      "name": "Insert into Supabase1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [-1072, 592],
+      "credentials": {
+        "supabaseApi": { "id": "A7ys0JIR9CyEzdCk", "name": "Supabase_Clay_and_light" }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true, \"message\": \"Reservation confirmed\", \"id\": \"{{ $('Insert into Supabase1').item.json.id }}\" }",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Access-Control-Allow-Origin", "value": "*" },
+              { "name": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
+              { "name": "Access-Control-Allow-Headers", "value": "Content-Type" }
+            ]
+          }
+        }
+      },
+      "id": "2e892a51-97f9-494b-a6c1-5bc69e20aef8",
+      "name": "Respond — Success1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [-832, 592]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Validate & Normalize1').item.json.email }}",
+        "subject": "Deine Tischreservierung bei Clay & Light",
+        "message": "=<!DOCTYPE html><html lang=\"de\"><head><meta charset=\"UTF-8\"></head><body style=\"margin:0;padding:0;background:#FDF8F3;font-family:Georgia,serif;\"><table width=\"100%\" style=\"background:#FDF8F3;padding:40px 20px;\"><tr><td align=\"center\"><table width=\"600\" style=\"background:#fff;border-radius:8px;overflow:hidden;\"><tr><td style=\"background:#221914;padding:40px 48px;\"><h1 style=\"margin:0;color:#FDF8F3;font-size:28px;font-weight:400;\">Clay &amp; Light</h1><p style=\"margin:8px 0 0;color:#D4BEA2;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;\">Kaffee. Ton. Stille.</p></td></tr><tr><td style=\"padding:48px;\"><h2 style=\"margin:0 0 8px;color:#A65D43;font-size:22px;font-weight:400;\">Dein Tisch ist reserviert.</h2><p style=\"margin:0 0 32px;color:#5C5248;font-size:15px;\">Wir freuen uns auf deinen Besuch.</p><table width=\"100%\" style=\"background:#FDF8F3;border-radius:6px;padding:24px;margin-bottom:32px;\"><tr><td style=\"padding:8px 0;border-bottom:1px solid #D4BEA2;\"><span style=\"color:#5C5248;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;\">Name</span><br><span style=\"color:#2D251E;font-size:16px;\">{{ $('Validate & Normalize1').item.json.name }}</span></td></tr><tr><td style=\"padding:8px 0;border-bottom:1px solid #D4BEA2;\"><span style=\"color:#5C5248;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;\">Datum &amp; Uhrzeit</span><br><span style=\"color:#2D251E;font-size:16px;\">{{ $('Validate & Normalize1').item.json.formattedTime }}</span></td></tr><tr><td style=\"padding:8px 0;\"><span style=\"color:#5C5248;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;\">Personen</span><br><span style=\"color:#2D251E;font-size:16px;\">{{ $('Validate & Normalize1').item.json.persons }}</span></td></tr></table>{{ $('Validate & Normalize1').item.json.notes ? '<p style=\"color:#2D251E;font-size:14px;padding:16px;background:#FDF8F3;border-radius:6px;\"><strong>Deine Notizen:</strong> ' + $('Validate & Normalize1').item.json.notes + '</p>' : '' }}<p style=\"color:#5C5248;font-size:13px;line-height:1.7;margin-top:32px;\">Bei Fragen erreichst du uns unter <a href=\"mailto:hello@clayandlight.at\" style=\"color:#A65D43;\">hello@clayandlight.at</a>.</p></td></tr><tr><td style=\"background:#221914;padding:24px 48px;\"><p style=\"margin:0;color:#5C5248;font-size:12px;\">Clay &amp; Light · Wien · <a href=\"https://clay-and-light.vercel.app/datenschutz\" style=\"color:#D4BEA2;\">Datenschutz</a> · <a href=\"https://clay-and-light.vercel.app/impressum\" style=\"color:#D4BEA2;\">Impressum</a></p></td></tr></table></td></tr></table></body></html>",
+        "options": {}
+      },
+      "id": "81d77303-c637-4734-900c-bb3f4f977dd5",
+      "name": "Email — Customer Confirmation1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [-608, 400],
+      "webhookId": "91863250-0871-40c0-ba03-0b6ac4463fdf",
+      "credentials": {
+        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "hello@clayandlight.at",
+        "subject": "=Neue Tischreservierung — {{ $('Validate & Normalize1').item.json.name }} ({{ $('Validate & Normalize1').item.json.persons }} Pers.)",
+        "message": "=<!DOCTYPE html><html lang=\"de\"><head><meta charset=\"UTF-8\"></head><body style=\"margin:0;padding:0;background:#FDF8F3;font-family:monospace;\"><table width=\"100%\" style=\"padding:32px;\"><tr><td align=\"center\"><table width=\"560\" style=\"background:#fff;border-radius:6px;border-left:4px solid #A65D43;padding:32px;\"><tr><td><h2 style=\"margin:0 0 24px;color:#A65D43;font-size:20px;\">Neue Tischreservierung</h2><table width=\"100%\" style=\"border-collapse:collapse;font-size:14px;\"><tr style=\"background:#FDF8F3;\"><td style=\"padding:8px 12px;color:#5C5248;\">Name</td><td style=\"padding:8px 12px;color:#2D251E;\">{{ $('Validate & Normalize1').item.json.name }}</td></tr><tr><td style=\"padding:8px 12px;color:#5C5248;\">E-Mail</td><td style=\"padding:8px 12px;\"><a href=\"mailto:{{ $('Validate & Normalize1').item.json.email }}\" style=\"color:#A65D43;\">{{ $('Validate & Normalize1').item.json.email }}</a></td></tr><tr style=\"background:#FDF8F3;\"><td style=\"padding:8px 12px;color:#5C5248;\">Telefon</td><td style=\"padding:8px 12px;color:#2D251E;\">{{ $('Validate & Normalize1').item.json.phone || '—' }}</td></tr><tr><td style=\"padding:8px 12px;color:#5C5248;\">Datum &amp; Zeit</td><td style=\"padding:8px 12px;color:#2D251E;font-weight:bold;\">{{ $('Validate & Normalize1').item.json.formattedTime }}</td></tr><tr style=\"background:#FDF8F3;\"><td style=\"padding:8px 12px;color:#5C5248;\">Personen</td><td style=\"padding:8px 12px;color:#2D251E;\">{{ $('Validate & Normalize1').item.json.persons }}</td></tr><tr><td style=\"padding:8px 12px;color:#5C5248;\">Gesch. Umsatz</td><td style=\"padding:8px 12px;color:#A65D43;font-weight:bold;\">€ {{ $('Validate & Normalize1').item.json.estimated_revenue.toFixed(2) }}</td></tr><tr style=\"background:#FDF8F3;\"><td style=\"padding:8px 12px;color:#5C5248;\">Marketing</td><td style=\"padding:8px 12px;color:#2D251E;\">{{ $('Validate & Normalize1').item.json.marketing_consent ? '✓ Ja' : '✗ Nein' }}</td></tr><tr><td style=\"padding:8px 12px;color:#5C5248;\">Notizen</td><td style=\"padding:8px 12px;color:#2D251E;\">{{ $('Validate & Normalize1').item.json.notes || '—' }}</td></tr></table><p style=\"margin:24px 0 0;color:#5C5248;font-size:12px;\">ID: {{ $('Insert into Supabase1').item.json.id }}</p></td></tr></table></td></tr></table></body></html>",
+        "options": {}
+      },
+      "id": "53591dfc-37cd-41bb-86cd-2bfda22d6c82",
+      "name": "Email — Owner Notification1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [-608, 592],
+      "webhookId": "5da00fcd-5906-4418-b95f-df636f355945",
+      "credentials": {
+        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "8707717333:AAEuWuzJi156AVMTeOUPL8FN4fyh-iltEFM",
+        "text": "=🍽 Neue Tischreservierung\n\nName: {{ $('Validate & Normalize1').item.json.name }}\nE-Mail: {{ $('Validate & Normalize1').item.json.email }}\nTelefon: {{ $('Validate & Normalize1').item.json.phone || '—' }}\nDatum & Zeit: {{ $('Validate & Normalize1').item.json.formattedTime }}\nPersonen: {{ $('Validate & Normalize1').item.json.persons }}\nGesch. Umsatz: € {{ $('Validate & Normalize1').item.json.estimated_revenue.toFixed(2) }}\nMarketing: {{ $('Validate & Normalize1').item.json.marketing_consent ? '✓ Ja' : '✗ Nein' }}\nNotizen: {{ $('Validate & Normalize1').item.json.notes || '—' }}\n\nID: {{ $('Insert into Supabase1').item.json.id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [-608, 784],
+      "id": "13084c29-3d74-4739-9f9d-d2b583ea2647",
+      "name": "Send a text message",
+      "webhookId": "928c972a-110c-476d-b3f6-6e4c1a964c54",
+      "credentials": {
+        "telegramApi": { "id": "vLQmBefPVZz26feZ", "name": "Clay and Light Assistant" }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "resumeTime": "={{ $('Validate & Normalize1').item.json.reminderAt }}"
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Wait — Until 24h Before Reservation",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [-608, 976],
+      "webhookId": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Validate & Normalize1').item.json.email }}",
+        "subject": "Erinnerung: Deine Tischreservierung morgen — Clay & Light",
+        "message": "=<!DOCTYPE html><html lang=\"de\"><head><meta charset=\"UTF-8\"></head><body style=\"margin:0;padding:0;background:#FDF8F3;font-family:Georgia,serif;\"><table width=\"100%\" style=\"padding:40px 20px;background:#FDF8F3;\"><tr><td align=\"center\"><table width=\"560\" style=\"background:#fff;border-radius:8px;overflow:hidden;\"><tr><td style=\"background:#4A5D4E;padding:28px 40px;\"><h1 style=\"margin:0;color:#FDF8F3;font-size:22px;font-weight:400;\">Nicht vergessen.</h1></td></tr><tr><td style=\"padding:40px;\"><p style=\"color:#2D251E;font-size:16px;\">Hallo {{ $('Validate & Normalize1').item.json.name }},</p><p style=\"color:#5C5248;font-size:15px;line-height:1.7;\">deine Tischreservierung bei Clay &amp; Light ist morgen:</p><p style=\"background:#FDF8F3;padding:16px;border-radius:6px;color:#A65D43;font-size:18px;font-weight:700;\">{{ $('Validate & Normalize1').item.json.formattedTime }}</p><p style=\"color:#5C5248;font-size:14px;\">{{ $('Validate & Normalize1').item.json.persons }} Person(en)</p>{{ $('Validate & Normalize1').item.json.notes ? '<p style=\"color:#2D251E;font-size:14px;padding:16px;background:#FDF8F3;border-radius:6px;\"><strong>Deine Notizen:</strong> ' + $('Validate & Normalize1').item.json.notes + '</p>' : '' }}<p style=\"color:#5C5248;font-size:13px;line-height:1.7;\">Wir freuen uns auf deinen Besuch.<br>Bei Fragen: <a href=\"mailto:hello@clayandlight.at\" style=\"color:#A65D43;\">hello@clayandlight.at</a></p></td></tr><tr><td style=\"background:#221914;padding:20px 40px;\"><p style=\"margin:0;color:#5C5248;font-size:12px;\">Clay &amp; Light · Wien · <a href=\"https://clay-and-light.vercel.app/datenschutz\" style=\"color:#D4BEA2;\">Datenschutz</a></p></td></tr></table></td></tr></table></body></html>",
+        "options": {}
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Email — Reminder (24h before)1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [-384, 976],
+      "webhookId": "d4e5f6a7-b8c9-0123-def0-234567890123",
+      "credentials": {
+        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook — Receive Reservation1": {
+      "main": [[{ "node": "Validate & Normalize1", "type": "main", "index": 0 }]]
+    },
+    "Validate & Normalize1": {
+      "main": [[{ "node": "Insert into Supabase1", "type": "main", "index": 0 }]]
+    },
+    "Insert into Supabase1": {
+      "main": [[
+        { "node": "Respond — Success1",                  "type": "main", "index": 0 },
+        { "node": "Email — Customer Confirmation1",       "type": "main", "index": 0 },
+        { "node": "Email — Owner Notification1",          "type": "main", "index": 0 },
+        { "node": "Send a text message",                  "type": "main", "index": 0 },
+        { "node": "Wait — Until 24h Before Reservation",  "type": "main", "index": 0 }
+      ]]
+    },
+    "Respond — Success1":                 { "main": [[]] },
+    "Email — Customer Confirmation1":     { "main": [[]] },
+    "Email — Owner Notification1":        { "main": [[]] },
+    "Send a text message":                { "main": [[]] },
+    "Wait — Until 24h Before Reservation": {
+      "main": [[{ "node": "Email — Reminder (24h before)1", "type": "main", "index": 0 }]]
+    },
+    "Email — Reminder (24h before)1":    { "main": [[]] }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  },
+  "versionId": "5832bbde-68b5-494a-a6a4-308f91bcce22",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6140dcd1eeef56988d97baa4d030a839e61618e52e7b6b6368007789e07414e1"
+  },
+  "id": "Y8aONvK5X9VomWoS",
+  "tags": []
+}

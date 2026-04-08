@@ -197,11 +197,11 @@ export function PotteryBookingForm({ webhookUrl, pricePerPerson = 45 }: Props) {
       </div>
 
       <p className="text-xs text-dusk">
-        Mit dem Absenden akzeptierst du unsere{' '}
+        Deine Daten werden ausschließlich zur Bearbeitung deiner Buchung
+        verwendet (Art. 6 Abs. 1 lit. b DSGVO).{' '}
         <a href="/datenschutz" className="text-pistachio hover:underline" target="_blank">
           Datenschutzerklärung
         </a>
-        .
       </p>
 
       <button
