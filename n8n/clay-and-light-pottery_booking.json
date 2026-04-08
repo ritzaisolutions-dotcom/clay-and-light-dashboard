@@ -14,29 +14,41 @@
       "name": "Webhook — Receive Booking",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [144, 208],
+      "position": [
+        144,
+        208
+      ],
       "webhookId": "ab190cad-3c4b-46f9-9c11-c0662b484f75"
     },
     {
       "parameters": {
-        "jsCode": "  let body;\n  const input = $input.first().json;\n\n  // ── Secret verification ──────────────────────────────────────────────\n  // Reject any request that did not come through the Next.js API proxy.\n  // Set WEBHOOK_SECRET in n8n Settings → Environment variables.\n  const incoming = (input.headers || {})['x-webhook-secret'];\n  const expected = $env.WEBHOOK_SECRET;\n  if (!expected) throw new Error('Server misconfiguration: WEBHOOK_SECRET env var not set in n8n');\n  if (incoming !== expected) throw new Error('Unauthorized: invalid or missing webhook secret');\n\n  if (typeof input.body === 'string') {\n    try { body = JSON.parse(input.body); }\n    catch(e) { throw new Error('Could not parse body: ' + e.message); }\n  } else if (input.body && typeof input.body === 'object') {\n    body = input.body;\n  } else if (input.name || input.email || input.type) {\n    body = input;\n  } else {\n    throw new Error('Unexpected input: ' + JSON.stringify(input).slice(0, 300));\n  }\n\n  if (body.type === 'payment_intent') {\n    return [{ json: { __type: 'payment_intent', ...body } }];\n  }\n\n  const required = ['name', 'email', 'timeslot', 'persons'];\n  const missing = required.filter(f => !body[f]);\n  if (missing.length > 0) throw new Error(`Missing required fields: ${missing.join(', ')}`);\n\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(body.email)) throw new Error('Invalid email address');\n\n  const persons = parseInt(body.persons);\n  if (persons < 1 || persons > 20) throw new Error('Persons must be between 1 and 20');\n\n  const pricePerPerson = parseFloat(body.price_per_person) || 45;\n  const totalPrice = persons * pricePerPerson;\n\n  const slotDate = new Date(body.timeslot);\n  const reminderAt = new Date(slotDate.getTime() - 24 * 60 * 60 * 1000);\n\n  return [{\n    json: {\n      __type: 'pottery_booking',\n      id: body.booking_id,\n      name: body.name.trim(),\n      email: body.email.trim().toLowerCase(),\n      phone: body.phone || null,\n      timeslot: slotDate.toISOString(),\n      persons,\n      price_per_person: pricePerPerson,\n      total_price: totalPrice,\n      notes: body.notes || null,\n      marketing_consent: body.marketing_consent === true || body.marketing_consent === 'true',\n      status: 'confirmed',\n      reminderAt: reminderAt.toISOString(),\n      formattedTimeslot: slotDate.toLocaleString('de-AT', {\n        timeZone: 'Europe/Vienna', weekday: 'long', year: 'numeric',\n        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'\n      })\n    }\n  }];"
+        "jsCode": "  let body;\n  const input = $input.first().json;\n\n  // ── Secret verification ──────────────────────────────────────────────\n  // Reject any request that did not come through the Next.js API proxy.\n  // Set WEBHOOK_SECRET in n8n Settings → Environment variables.\n  const incoming = (input.headers || {})['x-webhook-secret'];\n  const expected = $env.WEBHOOK_SECRET;\n  if (!expected) throw new Error('Server misconfiguration: WEBHOOK_SECRET env var not set in n8n');\n  if (incoming !== expected) throw new Error('Unauthorized: invalid or missing webhook secret');\n\n  if (typeof input.body === 'string') {\n    try { body = JSON.parse(input.body); }\n    catch(e) { throw new Error('Could not parse body: ' + e.message); }\n  } else if (input.body && typeof input.body === 'object') {\n    body = input.body;\n  } else if (input.name || input.email || input.type) {\n    body = input;\n  } else {\n    throw new Error('Unexpected input: ' + JSON.stringify(input).slice(0, 300));\n  }\n\n  if (body.type === 'payment_intent') {\n    return [{ json: { __type: 'payment_intent', ...body } }];\n  }\n\n  const required = ['name', 'email', 'timeslot', 'persons'];\n  const missing = required.filter(f => !body[f]);\n  if (missing.length > 0) throw new Error('Missing required fields: ' + missing.join(', '));\n\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(body.email)) throw new Error('Invalid email address');\n\n  const persons = parseInt(body.persons);\n  if (persons < 1 || persons > 20) throw new Error('Persons must be between 1 and 20');\n\n  // ── Pricing: always use the server-set value from the API route ───────\n  // Never trust price_per_person from the request body — the Next.js API\n  // route fetches the authoritative price from Supabase settings and sends\n  // it here. If that value is missing or invalid, fall back to the floor\n  // price. This prevents callers from manipulating booking revenue figures.\n  const priceFromApi = parseFloat(body.price_per_person);\n  const pricePerPerson = (Number.isFinite(priceFromApi) && priceFromApi > 0) ? priceFromApi : 45;\n  const totalPrice = persons * pricePerPerson;\n\n  const slotDate = new Date(body.timeslot);\n  const reminderAt = new Date(slotDate.getTime() - 24 * 60 * 60 * 1000);\n\n  return [{\n    json: {\n      __type: 'pottery_booking',\n      id: body.booking_id,\n      name: body.name.trim(),\n      email: body.email.trim().toLowerCase(),\n      phone: body.phone || null,\n      timeslot: slotDate.toISOString(),\n      persons,\n      price_per_person: pricePerPerson,\n      total_price: totalPrice,\n      notes: body.notes || null,\n      marketing_consent: body.marketing_consent === true || body.marketing_consent === 'true',\n      status: 'confirmed',\n      reminderAt: reminderAt.toISOString(),\n      formattedTimeslot: slotDate.toLocaleString('de-AT', {\n        timeZone: 'Europe/Vienna', weekday: 'long', year: 'numeric',\n        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'\n      })\n    }\n  }];"
       },
       "id": "108fe92d-5c83-424e-ad35-e306408369bf",
       "name": "Validate & Normalize",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [368, 208]
+      "position": [
+        368,
+        208
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "type-check",
               "leftValue": "={{ $json.__type }}",
               "rightValue": "pottery_booking",
-              "operator": { "type": "string", "operation": "equals" }
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -47,7 +59,10 @@
       "name": "Is Booking?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [592, 208]
+      "position": [
+        592,
+        208
+      ]
     },
     {
       "parameters": {
@@ -56,9 +71,18 @@
         "options": {
           "responseHeaders": {
             "entries": [
-              { "name": "Access-Control-Allow-Origin", "value": "*" },
-              { "name": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-              { "name": "Access-Control-Allow-Headers", "value": "Content-Type" }
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
             ]
           }
         }
@@ -67,7 +91,10 @@
       "name": "Respond — Payment Intent",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [816, 304]
+      "position": [
+        816,
+        304
+      ]
     },
     {
       "parameters": {
@@ -75,17 +102,50 @@
         "tableId": "pottery_bookings",
         "fieldsUi": {
           "fieldValues": [
-            { "fieldId": "id",                "fieldValue": "={{ $json.id }}" },
-            { "fieldId": "name",              "fieldValue": "={{ $json.name }}" },
-            { "fieldId": "email",             "fieldValue": "={{ $json.email }}" },
-            { "fieldId": "phone",             "fieldValue": "={{ $json.phone }}" },
-            { "fieldId": "timeslot",          "fieldValue": "={{ $json.timeslot }}" },
-            { "fieldId": "persons",           "fieldValue": "={{ $json.persons }}" },
-            { "fieldId": "notes",             "fieldValue": "={{ $json.notes }}" },
-            { "fieldId": "price_per_person",  "fieldValue": "={{ $json.price_per_person }}" },
-            { "fieldId": "total_price",       "fieldValue": "={{ $json.total_price }}" },
-            { "fieldId": "marketing_consent", "fieldValue": "={{ $json.marketing_consent }}" },
-            { "fieldId": "status",            "fieldValue": "={{ $json.status }}" }
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "timeslot",
+              "fieldValue": "={{ $json.timeslot }}"
+            },
+            {
+              "fieldId": "persons",
+              "fieldValue": "={{ $json.persons }}"
+            },
+            {
+              "fieldId": "notes",
+              "fieldValue": "={{ $json.notes }}"
+            },
+            {
+              "fieldId": "price_per_person",
+              "fieldValue": "={{ $json.price_per_person }}"
+            },
+            {
+              "fieldId": "total_price",
+              "fieldValue": "={{ $json.total_price }}"
+            },
+            {
+              "fieldId": "marketing_consent",
+              "fieldValue": "={{ $json.marketing_consent }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            }
           ]
         }
       },
@@ -93,7 +153,10 @@
       "name": "Insert into Supabase",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [816, 112],
+      "position": [
+        816,
+        112
+      ],
       "credentials": {
         "supabaseApi": {
           "id": "A7ys0JIR9CyEzdCk",
@@ -108,9 +171,18 @@
         "options": {
           "responseHeaders": {
             "entries": [
-              { "name": "Access-Control-Allow-Origin", "value": "*" },
-              { "name": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-              { "name": "Access-Control-Allow-Headers", "value": "Content-Type" }
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
             ]
           }
         }
@@ -119,7 +191,10 @@
       "name": "Respond — Success",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1040, 112]
+      "position": [
+        1040,
+        112
+      ]
     },
     {
       "parameters": {
@@ -132,10 +207,16 @@
       "name": "Email — Customer Confirmation",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [1264, -80],
+      "position": [
+        1264,
+        -80
+      ],
       "webhookId": "39cae1a4-5e4b-4ecd-94d6-527fc8f9ae3a",
       "credentials": {
-        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "Gmail account 3" }
+        "gmailOAuth2": {
+          "id": "FDojDyEfOMl97Vmb",
+          "name": "Gmail account 3"
+        }
       }
     },
     {
@@ -149,10 +230,16 @@
       "name": "Email — Owner Notification",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [1264, 112],
+      "position": [
+        1264,
+        112
+      ],
       "webhookId": "f4acfb42-800c-4008-a4e9-44b13c0de618",
       "credentials": {
-        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+        "gmailOAuth2": {
+          "id": "FDojDyEfOMl97Vmb",
+          "name": "ritzaisolutions@gmail.com"
+        }
       }
     },
     {
@@ -164,7 +251,10 @@
       "name": "Wait — Until 24h Before Slot",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [1264, 304],
+      "position": [
+        1264,
+        304
+      ],
       "webhookId": "c153cf25-c9fb-4208-8938-261ac6950c80"
     },
     {
@@ -178,10 +268,16 @@
       "name": "Email — Reminder (24h before)",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [1488, 304],
+      "position": [
+        1488,
+        304
+      ],
       "webhookId": "2f055d5e-9b7e-4c84-b2c1-05b7f8f6527f",
       "credentials": {
-        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "Gmail account 3" }
+        "gmailOAuth2": {
+          "id": "FDojDyEfOMl97Vmb",
+          "name": "Gmail account 3"
+        }
       }
     },
     {
@@ -192,46 +288,130 @@
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1264, 496],
+      "position": [
+        1264,
+        496
+      ],
       "id": "94f7552c-997b-4c6a-a623-90a40cd6a9d2",
       "name": "Send a text message",
       "webhookId": "ead7009d-e7b1-4d68-a6fc-176c05739ce4",
       "credentials": {
-        "telegramApi": { "id": "vLQmBefPVZz26feZ", "name": "Clay and Light Assistant" }
+        "telegramApi": {
+          "id": "vLQmBefPVZz26feZ",
+          "name": "Clay and Light Assistant"
+        }
       }
     }
   ],
   "pinData": {},
   "connections": {
     "Webhook — Receive Booking": {
-      "main": [[{ "node": "Validate & Normalize", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Validate & Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Validate & Normalize": {
-      "main": [[{ "node": "Is Booking?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Is Booking?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Is Booking?": {
       "main": [
-        [{ "node": "Insert into Supabase", "type": "main", "index": 0 }],
-        [{ "node": "Respond — Payment Intent", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Insert into Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond — Payment Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Insert into Supabase": {
-      "main": [[
-        { "node": "Respond — Success",             "type": "main", "index": 0 },
-        { "node": "Email — Customer Confirmation", "type": "main", "index": 0 },
-        { "node": "Email — Owner Notification",    "type": "main", "index": 0 },
-        { "node": "Wait — Until 24h Before Slot",  "type": "main", "index": 0 },
-        { "node": "Send a text message",           "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Respond — Success",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email — Customer Confirmation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email — Owner Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait — Until 24h Before Slot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Respond — Success":             { "main": [[]] },
-    "Email — Customer Confirmation": { "main": [[]] },
-    "Email — Owner Notification":    { "main": [[]] },
+    "Respond — Success": {
+      "main": [
+        []
+      ]
+    },
+    "Email — Customer Confirmation": {
+      "main": [
+        []
+      ]
+    },
+    "Email — Owner Notification": {
+      "main": [
+        []
+      ]
+    },
     "Wait — Until 24h Before Slot": {
-      "main": [[{ "node": "Email — Reminder (24h before)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Email — Reminder (24h before)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Email — Reminder (24h before)": { "main": [[]] },
-    "Send a text message":           { "main": [[]] }
+    "Email — Reminder (24h before)": {
+      "main": [
+        []
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    }
   },
   "active": true,
   "settings": {
