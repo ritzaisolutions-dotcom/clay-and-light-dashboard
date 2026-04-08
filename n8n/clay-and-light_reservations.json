@@ -14,7 +14,10 @@
       "name": "Webhook — Receive Reservation1",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [-1552, 592],
+      "position": [
+        -1552,
+        592
+      ],
       "webhookId": "4b6cd528-860e-492e-a1d0-47bb646d7448"
     },
     {
@@ -25,34 +28,77 @@
       "name": "Validate & Normalize1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-1312, 592]
+      "position": [
+        -1312,
+        592
+      ]
     },
     {
       "parameters": {
         "tableId": "reservations",
         "fieldsUi": {
           "fieldValues": [
-            { "fieldId": "id",                  "fieldValue": "={{ $json.id }}" },
-            { "fieldId": "name",                "fieldValue": "={{ $json.name }}" },
-            { "fieldId": "email",               "fieldValue": "={{ $json.email }}" },
-            { "fieldId": "phone",               "fieldValue": "={{ $json.phone }}" },
-            { "fieldId": "reservation_time",    "fieldValue": "={{ $json.reservation_time }}" },
-            { "fieldId": "persons",             "fieldValue": "={{ $json.persons }}" },
-            { "fieldId": "notes",               "fieldValue": "={{ $json.notes }}" },
-            { "fieldId": "marketing_consent",   "fieldValue": "={{ $json.marketing_consent }}" },
-            { "fieldId": "avg_spend_per_person","fieldValue": "={{ $json.avg_spend_per_person }}" },
-            { "fieldId": "estimated_revenue",   "fieldValue": "={{ $json.estimated_revenue }}" },
-            { "fieldId": "status",              "fieldValue": "={{ $json.status }}" }
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "reservation_time",
+              "fieldValue": "={{ $json.reservation_time }}"
+            },
+            {
+              "fieldId": "persons",
+              "fieldValue": "={{ $json.persons }}"
+            },
+            {
+              "fieldId": "notes",
+              "fieldValue": "={{ $json.notes }}"
+            },
+            {
+              "fieldId": "marketing_consent",
+              "fieldValue": "={{ $json.marketing_consent }}"
+            },
+            {
+              "fieldId": "avg_spend_per_person",
+              "fieldValue": "={{ $json.avg_spend_per_person }}"
+            },
+            {
+              "fieldId": "estimated_revenue",
+              "fieldValue": "={{ $json.estimated_revenue }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            }
           ]
-        }
+        },
+        "operation": "insert"
       },
       "id": "5f383c00-fd8c-4eb4-912a-69167a8c504f",
       "name": "Insert into Supabase1",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [-1072, 592],
+      "position": [
+        -1072,
+        592
+      ],
       "credentials": {
-        "supabaseApi": { "id": "A7ys0JIR9CyEzdCk", "name": "Supabase_Clay_and_light" }
+        "supabaseApi": {
+          "id": "A7ys0JIR9CyEzdCk",
+          "name": "Supabase_Clay_and_light"
+        }
       }
     },
     {
@@ -62,9 +108,18 @@
         "options": {
           "responseHeaders": {
             "entries": [
-              { "name": "Access-Control-Allow-Origin", "value": "*" },
-              { "name": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-              { "name": "Access-Control-Allow-Headers", "value": "Content-Type" }
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
             ]
           }
         }
@@ -73,7 +128,10 @@
       "name": "Respond — Success1",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [-832, 592]
+      "position": [
+        -832,
+        592
+      ]
     },
     {
       "parameters": {
@@ -86,10 +144,16 @@
       "name": "Email — Customer Confirmation1",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [-608, 400],
+      "position": [
+        -608,
+        400
+      ],
       "webhookId": "91863250-0871-40c0-ba03-0b6ac4463fdf",
       "credentials": {
-        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+        "gmailOAuth2": {
+          "id": "FDojDyEfOMl97Vmb",
+          "name": "ritzaisolutions@gmail.com"
+        }
       }
     },
     {
@@ -103,10 +167,16 @@
       "name": "Email — Owner Notification1",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [-608, 592],
+      "position": [
+        -608,
+        592
+      ],
       "webhookId": "5da00fcd-5906-4418-b95f-df636f355945",
       "credentials": {
-        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+        "gmailOAuth2": {
+          "id": "FDojDyEfOMl97Vmb",
+          "name": "ritzaisolutions@gmail.com"
+        }
       }
     },
     {
@@ -117,12 +187,18 @@
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [-608, 784],
+      "position": [
+        -608,
+        784
+      ],
       "id": "13084c29-3d74-4739-9f9d-d2b583ea2647",
       "name": "Send a text message",
       "webhookId": "928c972a-110c-476d-b3f6-6e4c1a964c54",
       "credentials": {
-        "telegramApi": { "id": "vLQmBefPVZz26feZ", "name": "Clay and Light Assistant" }
+        "telegramApi": {
+          "id": "vLQmBefPVZz26feZ",
+          "name": "Clay and Light Assistant"
+        }
       }
     },
     {
@@ -134,7 +210,10 @@
       "name": "Wait — Until 24h Before Reservation",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [-608, 976],
+      "position": [
+        -608,
+        976
+      ],
       "webhookId": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
     },
     {
@@ -148,38 +227,110 @@
       "name": "Email — Reminder (24h before)1",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [-384, 976],
+      "position": [
+        -384,
+        976
+      ],
       "webhookId": "d4e5f6a7-b8c9-0123-def0-234567890123",
       "credentials": {
-        "gmailOAuth2": { "id": "FDojDyEfOMl97Vmb", "name": "ritzaisolutions@gmail.com" }
+        "gmailOAuth2": {
+          "id": "FDojDyEfOMl97Vmb",
+          "name": "ritzaisolutions@gmail.com"
+        }
       }
     }
   ],
   "pinData": {},
   "connections": {
     "Webhook — Receive Reservation1": {
-      "main": [[{ "node": "Validate & Normalize1", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Validate & Normalize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Validate & Normalize1": {
-      "main": [[{ "node": "Insert into Supabase1", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Insert into Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Insert into Supabase1": {
-      "main": [[
-        { "node": "Respond — Success1",                  "type": "main", "index": 0 },
-        { "node": "Email — Customer Confirmation1",       "type": "main", "index": 0 },
-        { "node": "Email — Owner Notification1",          "type": "main", "index": 0 },
-        { "node": "Send a text message",                  "type": "main", "index": 0 },
-        { "node": "Wait — Until 24h Before Reservation",  "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Respond — Success1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email — Customer Confirmation1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email — Owner Notification1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait — Until 24h Before Reservation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Respond — Success1":                 { "main": [[]] },
-    "Email — Customer Confirmation1":     { "main": [[]] },
-    "Email — Owner Notification1":        { "main": [[]] },
-    "Send a text message":                { "main": [[]] },
+    "Respond — Success1": {
+      "main": [
+        []
+      ]
+    },
+    "Email — Customer Confirmation1": {
+      "main": [
+        []
+      ]
+    },
+    "Email — Owner Notification1": {
+      "main": [
+        []
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
     "Wait — Until 24h Before Reservation": {
-      "main": [[{ "node": "Email — Reminder (24h before)1", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Email — Reminder (24h before)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Email — Reminder (24h before)1":    { "main": [[]] }
+    "Email — Reminder (24h before)1": {
+      "main": [
+        []
+      ]
+    }
   },
   "active": true,
   "settings": {
