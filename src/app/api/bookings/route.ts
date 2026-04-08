@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getSettings } from '@/lib/supabase'
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS })
+}
+
 function supabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +28,7 @@ export async function POST(request: Request) {
     if (!name || !email || !timeslot || !persons) {
       return NextResponse.json(
         { success: false, error: 'Pflichtfelder fehlen.' },
-        { status: 400 }
+        { status: 400, headers: CORS }
       )
     }
 
@@ -26,7 +36,7 @@ export async function POST(request: Request) {
     if (new Date(timeslot) <= new Date()) {
       return NextResponse.json(
         { success: false, error: 'Der gewählte Termin liegt in der Vergangenheit.' },
-        { status: 400 }
+        { status: 400, headers: CORS }
       )
     }
 
@@ -45,7 +55,7 @@ export async function POST(request: Request) {
     } else if (conflicts && conflicts.length > 0) {
       return NextResponse.json(
         { success: false, error: 'Dieser Termin ist bereits vergeben. Bitte wähle einen anderen Zeitpunkt.' },
-        { status: 409 }
+        { status: 409, headers: CORS }
       )
     }
 
@@ -63,14 +73,14 @@ export async function POST(request: Request) {
       console.error('[api/bookings] N8N_POTTERY_WEBHOOK is not set')
       return NextResponse.json(
         { success: false, error: 'Buchungsdienst nicht verfügbar. Bitte versuche es später erneut.' },
-        { status: 503 }
+        { status: 503, headers: CORS }
       )
     }
     if (!webhookSecret) {
       console.error('[api/bookings] N8N_WEBHOOK_SECRET is not set')
       return NextResponse.json(
         { success: false, error: 'Buchungsdienst nicht konfiguriert.' },
-        { status: 503 }
+        { status: 503, headers: CORS }
       )
     }
 
@@ -100,14 +110,14 @@ export async function POST(request: Request) {
       console.error('[api/bookings] n8n returned', n8nRes.status, json)
       return NextResponse.json(
         { success: false, error: json.error || 'Buchung fehlgeschlagen. Bitte versuche es erneut.' },
-        { status: n8nRes.status }
+        { status: n8nRes.status, headers: CORS }
       )
     }
 
-    return NextResponse.json({ success: true, id: json.id ?? bookingId })
+    return NextResponse.json({ success: true, id: json.id ?? bookingId }, { headers: CORS })
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unbekannter Fehler'
     console.error('[api/bookings] unexpected error:', msg)
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    return NextResponse.json({ success: false, error: msg }, { status: 500, headers: CORS })
   }
 }
