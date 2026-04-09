@@ -12,6 +12,7 @@ interface FormData {
   reservation_slot: string
   persons: number
   notes: string
+  privacy_acknowledged: boolean
   marketing_consent: boolean
 }
 
@@ -94,6 +95,7 @@ export function ReservationForm({ webhookUrl }: Props) {
           reservation_time,
           persons: data.persons,
           notes: data.notes,
+          privacy_acknowledged: Boolean(data.privacy_acknowledged),
           marketing_consent: data.marketing_consent,
         }),
       })
@@ -254,10 +256,34 @@ export function ReservationForm({ webhookUrl }: Props) {
             {...register('notes')}
             className="input-field resize-none"
             rows={3}
-            placeholder="Allergien, Anlässe, Wünsche…"
+            placeholder="Anlass, Sitzplatzwunsch, organisatorische Hinweise"
           />
+          <p className="text-xs text-dusk mt-1">
+            Bitte keine sensiblen Gesundheitsdaten in dieses Feld schreiben.
+          </p>
         </div>
       </div>
+
+      <div className="flex gap-3 items-start p-4 bg-cloud rounded-lg border border-pale-pistachio">
+        <input
+          type="checkbox"
+          id="res_privacy_acknowledged"
+          {...register('privacy_acknowledged', {
+            required: 'Bitte bestaetige die Datenschutzerklaerung',
+          })}
+          className="mt-0.5 w-4 h-4 accent-pistachio"
+        />
+        <label htmlFor="res_privacy_acknowledged" className="text-xs text-dusk leading-relaxed">
+          Ich habe die{' '}
+          <a href="/datenschutz" className="text-pistachio hover:underline" target="_blank">
+            Datenschutzerklaerung
+          </a>{' '}
+          gelesen und zur Kenntnis genommen. Ohne diese Bestaetigung kann die Reservierung nicht abgesendet werden.
+        </label>
+      </div>
+      {errors.privacy_acknowledged && (
+        <p className="text-xs text-red-600 -mt-2">{errors.privacy_acknowledged.message}</p>
+      )}
 
       {/* GDPR marketing consent — optional, separate from booking data processing */}
       <div className="flex gap-3 items-start p-4 bg-cloud rounded-lg border border-pale-pistachio">
@@ -278,10 +304,10 @@ export function ReservationForm({ webhookUrl }: Props) {
       </div>
 
       <p className="text-xs text-dusk">
-        Deine Daten werden ausschließlich zur Bearbeitung deiner Reservierung
-        verwendet (Art. 6 Abs. 1 lit. b DSGVO).{' '}
+        Deine Daten werden zur Bearbeitung deiner Reservierung auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO verarbeitet.
+        Die Marketing-Einwilligung ist davon getrennt und freiwillig.{' '}
         <a href="/datenschutz" className="text-pistachio hover:underline" target="_blank">
-          Datenschutzerklärung
+          Datenschutzerklaerung
         </a>
       </p>
 

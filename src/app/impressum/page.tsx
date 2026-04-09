@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header'
 
 export const metadata = {
-  title: 'Impressum — Clay & Light',
+  title: 'Impressum - Clay & Light',
 }
 
 export default function ImpressumPage() {
@@ -9,24 +9,38 @@ export default function ImpressumPage() {
     <div>
       <Header
         title="Impressum"
-        subtitle="Pflichtangaben gemäß § 5 ECG und § 25 MedienG"
+        subtitle="Demo-Vorlage fuer Restaurants in Oesterreich"
       />
       <div className="px-8 py-8 max-w-3xl">
         <div className="bg-white rounded-lg border border-pale-pistachio p-8 space-y-8 text-sm leading-relaxed text-ink">
+          <section>
+            <h2 className="font-display text-xl text-burgundy mb-3">Demo-Hinweis</h2>
+            <p className="text-dusk">
+              Diese Seite ist eine Vorlage fuer Demo- und Kundenprojekte. Vor der
+              Liveschaltung muessen alle Platzhalter ersetzt und alle optionalen
+              Abschnitte an den tatsaechlich genutzten Betrieb, die echte Rechtsform
+              und die echten Prozesse angepasst werden.
+            </p>
+          </section>
 
           <section>
             <h2 className="font-display text-xl text-burgundy mb-3">
-              Informationen über den Diensteanbieter
+              Angaben zum Diensteanbieter
             </h2>
-            <p className="text-dusk text-xs mb-3 italic">
-              Bitte ersetze diese Platzhalter mit deinen realen Unternehmensdaten.
-            </p>
             <div className="space-y-1">
-              <p><strong>Unternehmensname:</strong> [Firmenname / Name der natürlichen Person]</p>
-              <p><strong>Rechtsform:</strong> [z.B. Einzelunternehmen / GmbH / OG]</p>
-              <p><strong>Adresse:</strong> [Straße und Hausnummer, PLZ Ort, Österreich]</p>
-              <p><strong>E-Mail:</strong> <a href="mailto:hello@clayandlight.at" className="text-pistachio hover:underline">hello@clayandlight.at</a></p>
-              <p><strong>Telefon:</strong> [+43 …]</p>
+              <p><strong>[CLIENT_BUSINESS_NAME / NAME]</strong></p>
+              <p><strong>Rechtsform:</strong> [CLIENT_BUSINESS_FORM]</p>
+              <p><strong>Adresse:</strong> [CLIENT_ADDRESS_FULL]</p>
+              <p>
+                <strong>E-Mail:</strong>{' '}
+                <a
+                  href="mailto:[CLIENT_PUBLIC_EMAIL]"
+                  className="text-pistachio hover:underline"
+                >
+                  [CLIENT_PUBLIC_EMAIL]
+                </a>
+              </p>
+              <p><strong>Telefon:</strong> [CLIENT_PUBLIC_PHONE]</p>
             </div>
           </section>
 
@@ -35,21 +49,21 @@ export default function ImpressumPage() {
               Unternehmensgegenstand
             </h2>
             <p>
-              Betrieb eines Slow-Cafés und Keramikstudios. Angebot von Töpfer-Workshops,
-              Tischreservierungen und kreativen Erlebnisformaten.
+              [z. B. Restaurant / Cafe / Bistro mit Online-Tischreservierungen,
+              Eventbuchungen und optionalem E-Mail-Marketing]
             </p>
           </section>
 
           <section>
             <h2 className="font-display text-xl text-burgundy mb-3">
-              Behördliche Zulassung / Gewerberecht
+              Register- und Aufsichtsangaben
             </h2>
             <div className="space-y-1">
-              <p><strong>Mitglied der Wirtschaftskammer Österreich (WKO):</strong> [Ja/Nein, ggf. Sparte]</p>
-              <p><strong>Anwendbare Gewerbeordnung:</strong> Österreichische Gewerbeordnung (GewO)</p>
-              <p><strong>UID-Nummer:</strong> [ATU…] (sofern vorhanden)</p>
-              <p><strong>Firmenbuchnummer:</strong> [FN …] (sofern vorhanden)</p>
-              <p><strong>Firmenbuchgericht:</strong> [Handelsgericht Wien, sofern relevant]</p>
+              <p><strong>Gewerbebehoerde:</strong> [CLIENT_COMPETENT_AUTHORITY]</p>
+              <p><strong>WKO / Fachgruppe:</strong> [CLIENT_WKO_DETAILS_IF_APPLICABLE]</p>
+              <p><strong>UID-Nummer:</strong> [CLIENT_UID_IF_APPLICABLE]</p>
+              <p><strong>Firmenbuchnummer:</strong> [CLIENT_COMPANY_REGISTER_NO_IF_APPLICABLE]</p>
+              <p><strong>Firmenbuchgericht:</strong> [CLIENT_REGISTER_COURT_IF_APPLICABLE]</p>
             </div>
           </section>
 
@@ -58,54 +72,43 @@ export default function ImpressumPage() {
               Grundlegende Richtung des Mediums
             </h2>
             <p>
-              Diese Website informiert über das Angebot von Clay &amp; Light, einem Slow-Café
-              und Keramikstudio in Wien. Sie ermöglicht Buchungen für Töpfer-Workshops
-              sowie Tischreservierungen.
+              Diese Website informiert ueber das gastronomische Angebot, Reservierungen,
+              Veranstaltungen und weitere Leistungen des Betriebs und ermoeglicht
+              Online-Anfragen bzw. Online-Buchungen.
             </p>
           </section>
 
           <section>
             <h2 className="font-display text-xl text-burgundy mb-3">
-              Haftungsausschluss
+              Haftung fuer Inhalte und Links
             </h2>
             <p>
-              Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für
-              die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind
-              ausschließlich deren Betreiber verantwortlich.
+              Trotz sorgfaeltiger inhaltlicher Kontrolle uebernehmen wir keine Haftung
+              fuer die Inhalte externer Links. Fuer den Inhalt der verlinkten Seiten
+              sind ausschliesslich deren Betreiber verantwortlich.
             </p>
             <p className="mt-2">
-              Alle Inhalte dieser Website sind urheberrechtlich geschützt.
-              Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung
-              außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung
-              des jeweiligen Autors bzw. Erstellers.
+              Alle Inhalte dieser Website sind urheberrechtlich geschuetzt, soweit
+              nicht anders gekennzeichnet.
             </p>
           </section>
 
           <section>
             <h2 className="font-display text-xl text-burgundy mb-3">
-              Online-Streitbeilegung
+              Verbraucherstreitbeilegung
             </h2>
             <p>
-              Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung
-              (OS) bereit:{' '}
-              <a
-                href="https://ec.europa.eu/consumers/odr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-pistachio hover:underline"
-              >
-                https://ec.europa.eu/consumers/odr
-              </a>
-              . Unsere E-Mail-Adresse findest du oben in diesem Impressum.
+              [Bitte hier individuell eintragen, ob der konkrete Betrieb zur Teilnahme
+              an Streitbeilegungsverfahren verpflichtet oder bereit ist.]
             </p>
-            <p className="mt-2">
-              Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren
-              vor einer Verbraucherschlichtungsstelle teilzunehmen.
+            <p className="mt-2 text-dusk">
+              Die fruehere EU-ODR-Plattform wird in dieser Vorlage bewusst nicht mehr
+              genannt, da sie seit dem 20. Juli 2025 eingestellt ist.
             </p>
           </section>
 
           <p className="text-dusk text-xs pt-4 border-t border-pale-pistachio">
-            Stand: April 2026 · Clay &amp; Light · Wien
+            Stand: April 2026 · Demo-Vorlage fuer Clay &amp; Light / Restaurant-Projekte
           </p>
         </div>
       </div>

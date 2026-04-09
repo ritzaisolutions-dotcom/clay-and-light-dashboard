@@ -135,10 +135,6 @@
               "fieldValue": "={{ $json.price_per_person }}"
             },
             {
-              "fieldId": "total_price",
-              "fieldValue": "={{ $json.total_price }}"
-            },
-            {
               "fieldId": "marketing_consent",
               "fieldValue": "={{ $json.marketing_consent }}"
             },
@@ -167,7 +163,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={ \"success\": true, \"message\": \"Booking confirmed\", \"id\": \"{{ $('Insert into Supabase').item.json.id }}\" }",
+        "responseBody": "={ \"success\": true, \"stored\": true, \"message\": \"Booking confirmed\", \"id\": \"{{ $('Validate & Normalize').item.json.id }}\" }",
         "options": {
           "responseHeaders": {
             "entries": [
@@ -283,7 +279,7 @@
     {
       "parameters": {
         "chatId": "=8707717333:AAEuWuzJi156AVMTeOUPL8FN4fyh-iltEFM",
-        "text": "=🏺 Neue Töpferbuchung\n\nName: {{ $('Validate & Normalize').item.json.name }}\nE-Mail: {{ $('Validate & Normalize').item.json.email }}\nTelefon: {{ $('Validate & Normalize').item.json.phone || '—' }}\nTermin: {{ $('Validate & Normalize').item.json.formattedTimeslot }}\nPersonen: {{ $('Validate & Normalize').item.json.persons }}\nPreis/Person: € {{ $('Validate & Normalize').item.json.price_per_person }}\nGesamt: € {{ $('Validate & Normalize').item.json.total_price.toFixed(2) }}\nMarketing: {{ $('Validate & Normalize').item.json.marketing_consent ? '✓ Ja' : '✗ Nein' }}\nNotizen: {{ $('Validate & Normalize').item.json.notes || '—' }}\n\nID: {{ $('Insert into Supabase').item.json.id }}",
+        "text": "=Neue Toepferbuchung\n\nName: {{ $('Validate & Normalize').item.json.name }}\nTermin: {{ $('Validate & Normalize').item.json.formattedTimeslot }}\nPersonen: {{ $('Validate & Normalize').item.json.persons }}\nNotizen: {{ $('Validate & Normalize').item.json.notes || 'keine' }}\n\nID: {{ $('Insert into Supabase').item.json.id }}",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.telegram",
